@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router";
 
 import { PageHeader } from "@/components/molecules/page-header";
-import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";
-import { useCreate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_PLURAL_PASCAL}}";
-import type { {{ENTITY_NAME}}CreateFormData } from "../schemas/{{ENTITY_KEBAB}}CreateSchema";
+import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_KEBAB}}-form";
+import { useCreate{{ENTITY_NAME}} } from "../hooks/use-{{ENTITY_KEBAB}}";
+import type { {{ENTITY_NAME}}CreateFormData } from "../schemas/{{ENTITY_KEBAB}}-create-schema";
 
 export function {{ENTITY_NAME}}CreatePage() {
     const navigate = useNavigate();

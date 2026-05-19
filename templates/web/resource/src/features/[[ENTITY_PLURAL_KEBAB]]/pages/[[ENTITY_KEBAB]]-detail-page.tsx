@@ -2,7 +2,7 @@ import { Navigate, useParams } from "react-router";
 
 import { PageHeader } from "@/components/molecules/page-header";
 import { Card, CardContent } from "@/components/ui/card";
-import { use{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_PLURAL_PASCAL}}";
+import { use{{ENTITY_NAME}} } from "../hooks/use-{{ENTITY_KEBAB}}";
 
 export function {{ENTITY_NAME}}DetailPage() {
     const params = useParams();

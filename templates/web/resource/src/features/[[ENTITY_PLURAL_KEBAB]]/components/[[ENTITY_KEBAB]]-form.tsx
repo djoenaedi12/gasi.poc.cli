@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
     {{ENTITY_VAR}}CreateSchema,
     type {{ENTITY_NAME}}CreateFormData,
-} from "../schemas/{{ENTITY_KEBAB}}CreateSchema";
+} from "../schemas/{{ENTITY_KEBAB}}-create-schema";
 import {
     {{ENTITY_VAR}}UpdateSchema,
     type {{ENTITY_NAME}}UpdateFormData,
-} from "../schemas/{{ENTITY_KEBAB}}UpdateSchema";
+} from "../schemas/{{ENTITY_KEBAB}}-update-schema";
 
 type {{ENTITY_NAME}}FormProps =
     | {

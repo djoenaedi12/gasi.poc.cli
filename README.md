@@ -430,6 +430,8 @@ Target `web` menghasilkan feature scaffold React yang sudah terhubung ke API:
 - list page yang mengambil data dari endpoint `/search/list`
 - create/edit/detail page yang memakai mutation/query API
 - routes untuk list, create, detail, dan edit
+- registrasi route otomatis ke `src/routes/index.tsx` jika router aplikasi memakai
+  pola `children: [...]`
 
 Generated service memakai path resource relatif seperti `/employees`,
 `/employees/search/list`, dan `/employees/{id}`. Prefix API `/api/v1`
@@ -441,7 +443,8 @@ export const api = axios.create({
 });
 ```
 
-Routes yang dihasilkan tetap perlu di-import ke router aplikasi.
+Jika struktur router berbeda, import route feature secara manual ke router
+aplikasi.
 
 ### Resource create — target all
 

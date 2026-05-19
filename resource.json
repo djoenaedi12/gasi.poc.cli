@@ -1,0 +1,312 @@
+{
+  "resources": [
+    {
+      "entityName": "Department",
+      "fields": [
+        {
+          "name": "code",
+          "type": "String",
+          "length": 50,
+          "required": true,
+          "unique": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 2,
+            "maxLength": 50,
+            "pattern": "^[A-Z0-9-]+$",
+            "patternMessage": "Code must contain uppercase letters, numbers, or dash only"
+          }
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 150
+          }
+        },
+        {
+          "name": "description",
+          "type": "Text",
+          "required": false,
+          "filterable": false,
+          "dto": {
+            "create": true,
+            "update": true,
+            "summary": false,
+            "detail": true
+          },
+          "validation": {
+            "maxLength": 1000
+          }
+        }
+      ]
+    },
+    {
+      "entityName": "JobTitle",
+      "fields": [
+        {
+          "name": "code",
+          "type": "String",
+          "length": 50,
+          "required": true,
+          "unique": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 2,
+            "maxLength": 50,
+            "pattern": "^[A-Z0-9-]+$",
+            "patternMessage": "Code must contain uppercase letters, numbers, or dash only"
+          }
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 150
+          }
+        },
+        {
+          "name": "level",
+          "type": "Integer",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "min": 1,
+            "max": 20
+          }
+        }
+      ]
+    },
+    {
+      "entityName": "Employee",
+      "fields": [
+        {
+          "name": "employeeNo",
+          "type": "String",
+          "length": 50,
+          "required": true,
+          "unique": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "^[A-Z0-9-]+$",
+            "patternMessage": "Employee number must contain uppercase letters, numbers, or dash only"
+          }
+        },
+        {
+          "name": "fullName",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 150
+          }
+        },
+        {
+          "name": "email",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "unique": true,
+          "filterable": true,
+          "validation": {
+            "email": true,
+            "maxLength": 150
+          }
+        },
+        {
+          "name": "phoneNumber",
+          "type": "String",
+          "length": 30,
+          "required": false,
+          "filterable": true,
+          "validation": {
+            "maxLength": 30,
+            "pattern": "^[0-9+ -]+$",
+            "patternMessage": "Phone number must contain numbers, plus, space, or dash only"
+          }
+        },
+        {
+          "name": "bio",
+          "type": "Text",
+          "required": false,
+          "filterable": false,
+          "validation": {
+            "maxLength": 2000
+          }
+        },
+        {
+          "name": "notes",
+          "type": "MediumText",
+          "required": false,
+          "filterable": false,
+          "dto": {
+            "create": true,
+            "update": true,
+            "summary": false,
+            "detail": true
+          }
+        },
+        {
+          "name": "age",
+          "type": "Integer",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "min": 18,
+            "max": 65
+          }
+        },
+        {
+          "name": "nationalId",
+          "type": "Long",
+          "required": false,
+          "unique": true,
+          "filterable": true,
+          "validation": {
+            "positive": true
+          }
+        },
+        {
+          "name": "salary",
+          "type": "BigDecimal",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "decimalMin": "0.00",
+            "decimalMax": "999999999.99",
+            "digits": {
+              "integer": 12,
+              "fraction": 2
+            }
+          }
+        },
+        {
+          "name": "performanceScore",
+          "type": "Double",
+          "required": false,
+          "filterable": true,
+          "validation": {
+            "decimalMin": "0.00",
+            "decimalMax": "100.00"
+          }
+        },
+        {
+          "name": "active",
+          "type": "Boolean",
+          "required": true,
+          "filterable": true
+        },
+        {
+          "name": "birthDate",
+          "type": "Date",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "past": true
+          }
+        },
+        {
+          "name": "joinedAt",
+          "type": "DateTime",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "pastOrPresent": true
+          }
+        },
+        {
+          "name": "lastLoginAt",
+          "type": "Instant",
+          "required": false,
+          "filterable": true,
+          "dto": {
+            "create": false,
+            "update": false,
+            "summary": true,
+            "detail": true
+          },
+          "validation": {
+            "pastOrPresent": true
+          }
+        },
+        {
+          "name": "status",
+          "type": "Enum",
+          "enumName": "EmployeeStatus",
+          "required": true,
+          "filterable": true
+        },
+        {
+          "name": "department",
+          "type": "ManyToOne",
+          "refEntity": "Department",
+          "required": true,
+          "filterable": true
+        },
+        {
+          "name": "jobTitle",
+          "type": "ManyToOne",
+          "refEntity": "JobTitle",
+          "required": true,
+          "filterable": true
+        }
+      ]
+    },
+    {
+      "entityName": "EmployeeEmergencyContact",
+      "parent": "Employee",
+      "as": "emergencyContacts",
+      "exposeApi": false,
+      "fields": [
+        {
+          "name": "name",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 150
+          }
+        },
+        {
+          "name": "relationship",
+          "type": "Enum",
+          "enumName": "EmergencyContactRelationship",
+          "required": true,
+          "filterable": true
+        },
+        {
+          "name": "phoneNumber",
+          "type": "String",
+          "length": 30,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "maxLength": 30,
+            "pattern": "^[0-9+ -]+$",
+            "patternMessage": "Phone number must contain numbers, plus, space, or dash only"
+          }
+        },
+        {
+          "name": "primaryContact",
+          "type": "Boolean",
+          "required": true,
+          "filterable": true
+        }
+      ]
+    }
+  ]
+}

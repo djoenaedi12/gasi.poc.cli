@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/molecules/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { get{{ENTITY_NAME}}Columns } from "../components/{{ENTITY_KEBAB}}-columns";
-import { useDelete{{ENTITY_NAME}}, use{{ENTITY_PLURAL_PASCAL}} } from "../hooks/use{{ENTITY_PLURAL_PASCAL}}";
+import { useDelete{{ENTITY_NAME}}, use{{ENTITY_PLURAL_PASCAL}} } from "../hooks/use-{{ENTITY_KEBAB}}";
 
 export function {{ENTITY_NAME}}ListPage() {
     const navigate = useNavigate();

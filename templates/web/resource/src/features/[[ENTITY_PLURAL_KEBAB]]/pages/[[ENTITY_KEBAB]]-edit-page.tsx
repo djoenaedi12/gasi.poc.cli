@@ -1,9 +1,9 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 
 import { PageHeader } from "@/components/molecules/page-header";
-import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";
-import { use{{ENTITY_NAME}}, useUpdate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_PLURAL_PASCAL}}";
-import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_KEBAB}}UpdateSchema";
+import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_KEBAB}}-form";
+import { use{{ENTITY_NAME}}, useUpdate{{ENTITY_NAME}} } from "../hooks/use-{{ENTITY_KEBAB}}";
+import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_KEBAB}}-update-schema";
 
 export function {{ENTITY_NAME}}EditPage() {
     const navigate = useNavigate();

@@ -1,25 +1,4 @@
-export type ApiResponse<T> = {
-    success: boolean;
-    message: string;
-    data: T;
-    errors?: string[];
-    timestamp?: string;
-};
-
-export type SearchRequest = {
-    filter?: unknown;
-    sorts?: unknown[];
-    page?: number;
-    size?: number;
-};
-
-export type PageResult<T> = {
-    content: T[];
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-};
+export type { ApiResponse, SearchRequest, PageResult } from "@/types/api.types";
 
 export type {{ENTITY_NAME}}Summary = {
     id: string;
