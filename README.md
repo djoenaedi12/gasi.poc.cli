@@ -371,6 +371,91 @@ gasi resource create \
 | `-f, --file`     | File definisi resource JSON. Bisa diulang               |
 | `-y, --yes`      | Skip confirmation prompt                                |
 | `--cwd <path>`   | Root project, default: current directory                |
+| `--target <target>` | Target generator: `api`, `web`, atau `all`           |
+| `--web-dir <path>` | Root project frontend untuk `--target web/all`        |
+| `--web-force`    | Overwrite file web generated yang sudah ada             |
+
+### Resource create — target api
+
+Target default `resource create` adalah `api`, jadi dua command ini setara:
+
+```bash
+gasi resource create Employee --file resources/employee.resource.json
+gasi resource create Employee --target api --file resources/employee.resource.json
+```
+
+Contoh dari project root dengan target plugin dipilih interaktif:
+
+```bash
+gasi resource create \
+  --target api \
+  --file resources/employee.resource.json
+```
+
+Contoh dari dalam folder plugin:
+
+```bash
+cd plugins/hr-plugin
+gasi resource create Employee \
+  --target api \
+  --file ../../resources/employee.resource.json \
+  --yes
+```
+
+Target `api` menghasilkan file backend Clean Architecture di plugin:
+
+- DTO create/update/summary/detail
+- domain model dan service port
+- service implementation
+- repository port, adapter, entity, mapper, dan Spring Data repository
+- REST controller yang extend `BaseController`
+- Flyway migration SQL
+- dependency plugin yang dibutuhkan di `pom.xml`
+
+### Resource create — target web
+
+Contoh generate frontend saja:
+
+```bash
+gasi resource create Employee \
+  --target web \
+  --web-dir ../gasi.poc.web \
+  --file resources/employee.resource.json
+```
+
+Target `web` menghasilkan feature scaffold React yang sudah terhubung ke API:
+
+- service API dengan unwrap `ApiResponse.data`
+- TanStack Query hooks untuk list, detail, create, update, dan delete
+- list page yang mengambil data dari endpoint `/search/list`
+- create/edit/detail page yang memakai mutation/query API
+- routes untuk list, create, detail, dan edit
+
+Generated service memakai path resource relatif seperti `/employees`,
+`/employees/search/list`, dan `/employees/{id}`. Prefix API `/api/v1`
+diambil dari konfigurasi axios frontend, misalnya:
+
+```ts
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1",
+});
+```
+
+Routes yang dihasilkan tetap perlu di-import ke router aplikasi.
+
+### Resource create — target all
+
+Target `all` menjalankan generator API lebih dulu, lalu memakai resource spec
+yang sama untuk generate scaffold web. Gunakan `--web-dir` supaya CLI tahu
+lokasi project frontend.
+
+```bash
+gasi resource create Employee \
+  --target all \
+  --web-dir ../gasi.poc.web \
+  --file resources/employee.resource.json \
+  --yes
+```
 
 ### Format JSON: single resource
 
@@ -1007,13 +1092,13 @@ Employee -> employees
 UserRole -> user_roles
 ```
 
-### Resource delete
+### Resource delete — target api
 
 ```bash
 gasi resource delete Employee
 ```
 
-Menghapus semua file generated resource untuk entity tertentu dari plugin yang dipilih.
+Menghapus semua file generated API resource untuk entity tertentu dari plugin yang dipilih.
 
 Useful flags:
 
@@ -1051,7 +1136,7 @@ Token yang tersedia untuk plugin template:
 | `I18N_BASENAME`          | `classpath:i18n/payroll/messages`             |
 | `MIGRATION_TIMESTAMP`    | `20260512143052`                              |
 
-Token yang biasanya tersedia untuk resource template tergantung implementasi `resource-generator`, tetapi minimal biasanya mencakup:
+Token yang biasanya tersedia untuk API resource template tergantung implementasi `api-resource-generator` dan `api-resource-templates`, tetapi minimal biasanya mencakup:
 
 | Token / Value      | Contoh value              |
 |--------------------|---------------------------|
