@@ -1,36 +1,34 @@
-import { Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Plus, Upload } from "lucide-react";
+import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
 
-import { DataTable } from "@/components/datatable/data-table";
-import { ConfirmDialog } from "@/components/molecules/confirm-dialog";
+import { DataTableBulkDeleteAction } from "@/components/datatable/data-table-bulk-delete-action";
+import { ServerDataTable } from "@/components/datatable/data-table";
 import { PageHeader } from "@/components/molecules/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { get{{ENTITY_NAME}}Columns } from "../components/{{ENTITY_KEBAB}}-columns";
-import { useDelete{{ENTITY_NAME}}, use{{ENTITY_PLURAL_PASCAL}} } from "../hooks/use-{{ENTITY_KEBAB}}";
+import { useDelete{{ENTITY_NAME}}, use{{ENTITY_PLURAL_PASCAL}}Page } from "../hooks/use-{{ENTITY_KEBAB}}";
 
 export function {{ENTITY_NAME}}ListPage() {
     const navigate = useNavigate();
-    const [search, setSearch] = useState("");
-    const {{ENTITY_PLURAL}}Query = use{{ENTITY_PLURAL_PASCAL}}();
     const delete{{ENTITY_NAME}} = useDelete{{ENTITY_NAME}}();
-    const data = {{ENTITY_PLURAL}}Query.data ?? [];
 
-    const handleDelete = (id: string) => {
+    const handleDelete = useCallback((id: string) => {
         delete{{ENTITY_NAME}}.mutate(id);
-    };
+    }, [delete{{ENTITY_NAME}}]);
 
-    const handleBulkDelete = (ids: string[]) => {
+    const handleBulkDelete = useCallback((ids: string[]) => {
         ids.forEach((id) => delete{{ENTITY_NAME}}.mutate(id));
-    };
+    }, [delete{{ENTITY_NAME}}]);
+
+    const handleBulkUpload = useCallback(() => {
+        console.log("Open {{ENTITY_PLURAL_TITLE}} bulk upload flow");
+    }, []);
 
     const columns = useMemo(
-        () =>
-            get{{ENTITY_NAME}}Columns({
-                onDelete: handleDelete,
-            }),
-        [],
+        () => get{{ENTITY_NAME}}Columns({ onDelete: handleDelete }),
+        [handleDelete],
     );
 
     return (
@@ -39,36 +37,56 @@ export function {{ENTITY_NAME}}ListPage() {
 
             <Card>
                 <CardContent>
-                    <DataTable
+                    <ServerDataTable
                         columns={columns}
-                        data={data}
+                        pageQuery={use{{ENTITY_PLURAL_PASCAL}}Page}
+                        searchFields={{{SEARCH_FIELDS}}}
                         searchPlaceholder="Search {{ENTITY_PLURAL}}..."
-                        emptyTitle={{{ENTITY_PLURAL}}Query.isLoading ? "Loading {{ENTITY_PLURAL_TITLE}}..." : "No {{ENTITY_PLURAL_TITLE}} found"}
-                        emptyDescription={{{ENTITY_PLURAL}}Query.isError ? "Unable to load data from API." : "Create a new {{ENTITY_VAR_TITLE}} to get started."}
-                        searchValue={search}
-                        onSearchChange={setSearch}
+                        loadingTitle="Loading {{ENTITY_PLURAL_TITLE}}..."
+                        emptyTitle="No {{ENTITY_PLURAL_TITLE}} found"
+                        emptyDescription="Create a new {{ENTITY_VAR_TITLE}} to get started."
+                        emptyAction={
+                            <>
+                                <Button type="button" onClick={() => navigate("{{ROUTE_PATH}}/create")}>
+                                    <Plus className="size-4" />
+                                    Create {{ENTITY_VAR_TITLE}}
+                                </Button>
+
+                                <Button type="button" variant="outline" onClick={handleBulkUpload}>
+                                    <Upload className="size-4" />
+                                    Bulk Upload
+                                </Button>
+                            </>
+                        }
+                        enableCsvExport
+                        csvFileName="{{ENTITY_PLURAL_KEBAB}}"
                         enableColumnSettings
                         columnPreferenceKey="{{ENTITY_KEBAB}}-table"
+                        defaultVisibleColumns={{{DEFAULT_VISIBLE_COLUMNS}}}
                         primaryAction={{
                             label: "Add {{ENTITY_VAR_TITLE}}",
                             icon: <Plus className="size-4" />,
-                            onClick: () => navigate("{{ROUTE_PATH}}/create"),
+                            items: [
+                                {
+                                    label: "Add {{ENTITY_VAR_TITLE}}",
+                                    icon: <Plus className="size-4" />,
+                                    onClick: () => navigate("{{ROUTE_PATH}}/create"),
+                                },
+                                {
+                                    label: "Bulk Upload",
+                                    icon: <Upload className="size-4" />,
+                                    onClick: handleBulkUpload,
+                                },
+                            ],
                         }}
                         enableRowSelection
                         getRowId={(row) => row.id}
                         renderSelectedActions={(selectedRows) => (
-                            <ConfirmDialog
-                                destructive
-                                title="Delete selected {{ENTITY_PLURAL}}?"
-                                description={`You are about to delete ${selectedRows.length} {{ENTITY_PLURAL}}. This action cannot be undone.`}
-                                confirmLabel="Delete"
-                                trigger={
-                                    <Button type="button" variant="destructive" size="sm">
-                                        <Trash2 className="size-4" />
-                                        Delete selected
-                                    </Button>
-                                }
-                                onConfirm={() => handleBulkDelete(selectedRows.map((row) => row.id))}
+                            <DataTableBulkDeleteAction
+                                selectedRows={selectedRows}
+                                entityName="{{ENTITY_PLURAL}}"
+                                getRowId={(row) => row.id}
+                                onDelete={handleBulkDelete}
                             />
                         )}
                     />

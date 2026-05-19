@@ -16,6 +16,7 @@ const hooks = createBaseHooks<
 
 export const {{ENTITY_VAR}}QueryKeys = hooks.queryKeys;
 export const use{{ENTITY_PLURAL_PASCAL}} = hooks.useList;
+export const use{{ENTITY_PLURAL_PASCAL}}Page = hooks.usePage;
 export const use{{ENTITY_NAME}} = hooks.useDetail;
 export const useCreate{{ENTITY_NAME}} = hooks.useCreate;
 export const useUpdate{{ENTITY_NAME}} = hooks.useUpdate;

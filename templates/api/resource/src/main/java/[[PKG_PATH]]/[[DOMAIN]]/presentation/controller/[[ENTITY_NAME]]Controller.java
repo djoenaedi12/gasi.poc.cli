@@ -1,5 +1,7 @@
 package {{FULL_PACKAGE}}.presentation.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,5 +26,10 @@ public class {{ENTITY_NAME}}Controller
     @Override
     public String getResourceName() {
         return "{{ENTITY_NAME}}";
+    }
+
+    @Override
+    protected List<String> getDefaultSummaryFields() {
+        return List.of({{CONTROLLER_DEFAULT_SUMMARY_FIELDS}});
     }
 }

@@ -10,6 +10,7 @@
           "required": true,
           "unique": true,
           "filterable": true,
+          "defaultColumn": true,
           "validation": {
             "minLength": 2,
             "maxLength": 50,
@@ -23,6 +24,7 @@
           "length": 150,
           "required": true,
           "filterable": true,
+          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
@@ -55,6 +57,7 @@
           "required": true,
           "unique": true,
           "filterable": true,
+          "defaultColumn": true,
           "validation": {
             "minLength": 2,
             "maxLength": 50,
@@ -68,6 +71,7 @@
           "length": 150,
           "required": true,
           "filterable": true,
+          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
@@ -78,6 +82,7 @@
           "type": "Integer",
           "required": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "min": 1,
             "max": 20
@@ -95,6 +100,7 @@
           "required": true,
           "unique": true,
           "filterable": true,
+          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 50,
@@ -108,6 +114,7 @@
           "length": 150,
           "required": true,
           "filterable": true,
+          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
@@ -120,6 +127,7 @@
           "required": true,
           "unique": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "email": true,
             "maxLength": 150
@@ -131,6 +139,7 @@
           "length": 30,
           "required": false,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "maxLength": 30,
             "pattern": "^[0-9+ -]+$",
@@ -142,6 +151,7 @@
           "type": "Text",
           "required": false,
           "filterable": false,
+          "defaultColumn": false,
           "validation": {
             "maxLength": 2000
           }
@@ -163,6 +173,7 @@
           "type": "Integer",
           "required": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "min": 18,
             "max": 65
@@ -174,6 +185,7 @@
           "required": false,
           "unique": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "positive": true
           }
@@ -183,6 +195,7 @@
           "type": "BigDecimal",
           "required": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "decimalMin": "0.00",
             "decimalMax": "999999999.99",
@@ -197,6 +210,7 @@
           "type": "Double",
           "required": false,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "decimalMin": "0.00",
             "decimalMax": "100.00"
@@ -206,13 +220,15 @@
           "name": "active",
           "type": "Boolean",
           "required": true,
-          "filterable": true
+          "filterable": true,
+          "defaultColumn": false
         },
         {
           "name": "birthDate",
           "type": "Date",
           "required": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "past": true
           }
@@ -222,6 +238,7 @@
           "type": "DateTime",
           "required": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "pastOrPresent": true
           }
@@ -231,6 +248,7 @@
           "type": "Instant",
           "required": false,
           "filterable": true,
+          "defaultColumn": false,
           "dto": {
             "create": false,
             "update": false,
@@ -246,21 +264,24 @@
           "type": "Enum",
           "enumName": "EmployeeStatus",
           "required": true,
-          "filterable": true
+          "filterable": true,
+          "defaultColumn": true
         },
         {
           "name": "department",
           "type": "ManyToOne",
           "refEntity": "Department",
           "required": true,
-          "filterable": true
+          "filterable": true,
+          "defaultColumn": true
         },
         {
           "name": "jobTitle",
           "type": "ManyToOne",
           "refEntity": "JobTitle",
           "required": true,
-          "filterable": true
+          "filterable": true,
+          "defaultColumn": false
         }
       ]
     },
@@ -276,6 +297,7 @@
           "length": 150,
           "required": true,
           "filterable": true,
+          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
@@ -286,7 +308,8 @@
           "type": "Enum",
           "enumName": "EmergencyContactRelationship",
           "required": true,
-          "filterable": true
+          "filterable": true,
+          "defaultColumn": true
         },
         {
           "name": "phoneNumber",
@@ -294,6 +317,7 @@
           "length": 30,
           "required": true,
           "filterable": true,
+          "defaultColumn": false,
           "validation": {
             "maxLength": 30,
             "pattern": "^[0-9+ -]+$",
@@ -304,7 +328,8 @@
           "name": "primaryContact",
           "type": "Boolean",
           "required": true,
-          "filterable": true
+          "filterable": true,
+          "defaultColumn": true
         }
       ]
     }
