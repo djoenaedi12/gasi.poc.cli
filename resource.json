@@ -289,6 +289,7 @@
       "entityName": "EmployeeEmergencyContact",
       "parent": "Employee",
       "as": "emergencyContacts",
+      "embedInParentDto": true,
       "exposeApi": false,
       "fields": [
         {
@@ -327,6 +328,135 @@
         {
           "name": "primaryContact",
           "type": "Boolean",
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true
+        },
+        {
+          "name": "contactDepartment",
+          "type": "ManyToOne",
+          "refEntity": "Department",
+          "required": false,
+          "filterable": true,
+          "defaultColumn": false
+        }
+      ]
+    },
+    {
+      "entityName": "EmployeeAddress",
+      "parent": "Employee",
+      "apiStyle": "nested",
+      "embedInParentDto": false,
+      "exposeApi": true,
+      "fields": [
+        {
+          "name": "addressType",
+          "type": "Enum",
+          "enumName": "EmployeeAddressType",
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true
+        },
+        {
+          "name": "addressLine",
+          "type": "String",
+          "length": 255,
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true,
+          "validation": {
+            "minLength": 5,
+            "maxLength": 255
+          }
+        },
+        {
+          "name": "city",
+          "type": "String",
+          "length": 100,
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true,
+          "validation": {
+            "minLength": 2,
+            "maxLength": 100
+          }
+        },
+        {
+          "name": "postalCode",
+          "type": "String",
+          "length": 20,
+          "required": false,
+          "filterable": true,
+          "defaultColumn": false,
+          "validation": {
+            "maxLength": 20
+          }
+        },
+        {
+          "name": "primaryAddress",
+          "type": "Boolean",
+          "required": true,
+          "filterable": true,
+          "defaultColumn": false
+        }
+      ]
+    },
+    {
+      "entityName": "EmployeeAsset",
+      "parent": "Employee",
+      "apiStyle": "root",
+      "embedInParentDto": false,
+      "exposeApi": true,
+      "fields": [
+        {
+          "name": "assetTag",
+          "type": "String",
+          "length": 80,
+          "required": true,
+          "unique": true,
+          "filterable": true,
+          "defaultColumn": true,
+          "validation": {
+            "minLength": 2,
+            "maxLength": 80
+          }
+        },
+        {
+          "name": "assetName",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true,
+          "validation": {
+            "minLength": 2,
+            "maxLength": 150
+          }
+        },
+        {
+          "name": "issuedAt",
+          "type": "Date",
+          "required": true,
+          "filterable": true,
+          "defaultColumn": false,
+          "validation": {
+            "pastOrPresent": true
+          }
+        },
+        {
+          "name": "returnedAt",
+          "type": "Date",
+          "required": false,
+          "filterable": true,
+          "defaultColumn": false,
+          "validation": {
+            "pastOrPresent": true
+          }
+        },
+        {
+          "name": "assetStatus",
+          "type": "Enum",
+          "enumName": "EmployeeAssetStatus",
           "required": true,
           "filterable": true,
           "defaultColumn": true

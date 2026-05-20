@@ -8,16 +8,17 @@ import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_KEBAB}}-
 export function {{ENTITY_NAME}}EditPage() {
     const navigate = useNavigate();
     const params = useParams();
-    const {{ENTITY_VAR}}Query = use{{ENTITY_NAME}}(params.id);
-    const update{{ENTITY_NAME}} = useUpdate{{ENTITY_NAME}}();
+{{EDIT_PARENT_SETUP}}
+    const {{ENTITY_VAR}}Query = use{{ENTITY_NAME}}({{DETAIL_QUERY_ARGS}});
+    const update{{ENTITY_NAME}} = useUpdate{{ENTITY_NAME}}({{UPDATE_HOOK_ARGS}});
 
     if (!params.id) {
-        return <Navigate to="{{ROUTE_PATH}}" replace />;
+        return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
     }
 
     const handleSubmit = async (data: {{ENTITY_NAME}}UpdateFormData) => {
         await update{{ENTITY_NAME}}.mutateAsync({ id: params.id as string, data });
-        navigate("{{ROUTE_PATH}}");
+        navigate({{NAVIGATE_LIST}});
     };
 
     if ({{ENTITY_VAR}}Query.isLoading) {
@@ -29,7 +30,7 @@ export function {{ENTITY_NAME}}EditPage() {
     }
 
     if ({{ENTITY_VAR}}Query.isError || !{{ENTITY_VAR}}Query.data) {
-        return <Navigate to="{{ROUTE_PATH}}" replace />;
+        return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
     }
 
     return (
@@ -39,7 +40,7 @@ export function {{ENTITY_NAME}}EditPage() {
                 mode="edit"
                 defaultValues={{{ENTITY_VAR}}Query.data}
                 submitLabel={update{{ENTITY_NAME}}.isPending ? "Saving..." : "Save changes"}
-                onCancel={() => navigate("{{ROUTE_PATH}}")}
+                onCancel={() => navigate({{NAVIGATE_LIST}})}
                 onSubmit={handleSubmit}
             />
         </div>

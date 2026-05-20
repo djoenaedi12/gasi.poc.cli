@@ -41,7 +41,7 @@ export function {{ENTITY_NAME}}Form(props: {{ENTITY_NAME}}FormProps) {
         <Card>
             <CardContent>
                 <form onSubmit={form.handleSubmit(props.onSubmit)} className="space-y-6">
-                    <div className="grid gap-5 md:grid-cols-2">
+                    <div className="grid max-w-3xl gap-5">
 {{FORM_FIELDS}}
                     </div>
 

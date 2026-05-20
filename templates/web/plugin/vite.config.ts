@@ -4,6 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'production'),
+  },
   resolve: {
     alias: {
       '@gasi/core-api': path.resolve(__dirname, '../../core-api/src'),
@@ -18,11 +21,12 @@ export default defineConfig({
       fileName: 'plugin-{{PLUGIN_NAME}}',
     },
     rollupOptions: {
-      external: ['react', 'react-dom', '@gasi/core-api', '@gasi/core-starter', '@gasi/core-ui'],
+      external: ['react', 'react-dom', 'react-router', '@gasi/core-api', '@gasi/core-starter', '@gasi/core-ui'],
       output: {
         globals: {
           'react':               'React',
           'react-dom':           'ReactDOM',
+          'react-router':        'ReactRouter',
           '@gasi/core-api':     'GasiCoreApi',
           '@gasi/core-starter': 'GasiCoreStarter',
           '@gasi/core-ui':      'GasiCoreUi',

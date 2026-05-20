@@ -49,7 +49,7 @@ plugins/hr-plugin/
 │   ├── features/hr/routes.tsx   ← entry point routes
 │   └── index.ts                 ← register ke pluginRegistry
 ├── package.json
-├── vite.config.ts               ← build UMD → platform-app/public/plugins/
+├── vite.config.ts               ← build UMD untuk runtime plugin host
 └── tsconfig.json
 ```
 
@@ -73,7 +73,7 @@ gasi plugin build hr --target all
 gasi plugin build hr --target all --dry-run
 ```
 
-Web build output ke `plugins/hr-plugin/dist/plugin-hr.umd.js`.
+Web build output ke `plugins/hr-plugin/dist/plugin-hr.umd.cjs`.
 
 ---
 
@@ -85,7 +85,7 @@ Deploy plugin ke platform.
 # Deploy API (copy JAR → platform-app/plugins/)
 gasi plugin deploy hr --target api
 
-# Deploy Web (verifikasi bundle ada di platform-app/public/plugins/)
+# Deploy Web (copy bundle dan update manifest)
 gasi plugin deploy hr --target web
 
 # Keduanya
@@ -95,7 +95,8 @@ gasi plugin deploy hr --target all
 gasi plugin deploy hr --target all --dry-run
 ```
 
-> Web deploy copy file dari `plugins/hr-plugin/dist/` ke `platform-app/public/plugins/`.
+> Web deploy copy file dari `plugins/hr-plugin/dist/` ke `platform-app/public/plugins/`
+> dan menambahkan URL bundle ke `platform-app/public/plugins/manifest.json`.
 
 
 ---
@@ -108,7 +109,7 @@ Hapus deployed files dari platform.
 # Hapus JAR dari platform-app/plugins/
 gasi plugin clean hr --target api
 
-# Hapus .umd.js dari platform-app/public/plugins/
+# Hapus UMD dari platform-app/public/plugins/ dan manifest
 gasi plugin clean hr --target web
 
 # Keduanya
@@ -152,7 +153,8 @@ Delete plan:
 
   Web:
     Remove dir      : plugins/hr-plugin
-    Remove bundle   : platform-app/public/plugins/plugin-hr.umd.js
+    Remove bundle   : platform-app/public/plugins/plugin-hr.umd.cjs
+    Remove manifest : /plugins/plugin-hr.umd.cjs
 ```
 
 ---
@@ -221,3 +223,72 @@ gasi uploader create Employee --plugin hr
 ```
 
 **Tipe field:** `String`, `Integer`, `Long`, `BigDecimal`, `Double`, `Boolean`, `Date`, `DateTime`, `Instant`, `ManyToOne`, `Enum`
+
+Resource child bisa menambahkan `parent` tanpa mendefinisikan field parent secara manual. CLI otomatis menambahkan relasi `ManyToOne` dengan nama field lower-camel dari parent, misalnya `parent: "Employee"` menjadi field domain `employee` dan DTO field `employeeId`.
+
+```json
+{
+  "entityName": "Department",
+  "parent": "Employee",
+  "apiStyle": "root",
+  "embedInParentDto": false,
+  "exposeApi": true,
+  "fields": [
+    { "name": "name", "type": "String" }
+  ]
+}
+```
+
+Default saat `parent` diisi:
+
+- `apiStyle`: `nested`
+- `embedInParentDto`: `false`
+- `exposeApi`: `true`
+
+Gunakan `apiStyle: "root"` kalau parent id dikirim dari DTO child, misalnya `employeeId`. Untuk web generator, mode ini membuat input lookup parent di form child dan service FE memakai `/api/v1/departments`.
+
+Gunakan `apiStyle: "nested"` kalau parent id berasal dari URL. Untuk web generator, route dan axios service akan mengikuti parent path, misalnya `/employees/:employeeId/departments` dan `/api/v1/employees/${employeeId}/departments`.
+
+Gunakan `embedInParentDto: true` kalau child kecil perlu ikut masuk ke DTO parent dan disubmit bareng parent. Untuk API generator, mode ini menambahkan field child ke `ParentCreateRequest`, `ParentUpdateRequest`, `ParentDetailResponse`, mapper, dan service parent. Untuk web generator, mode ini menambahkan inline editable table di form parent memakai `FormArrayTable`.
+
+Contoh embedded child:
+
+```json
+{
+  "entityName": "EmployeeEmergencyContact",
+  "parent": "Employee",
+  "as": "emergencyContacts",
+  "embedInParentDto": true,
+  "exposeApi": false,
+  "fields": [
+    { "name": "name", "type": "String", "required": true },
+    { "name": "relationship", "type": "Enum", "enumName": "EmergencyContactRelationship", "required": true },
+    { "name": "department", "type": "ManyToOne", "refEntity": "Department", "required": true },
+    { "name": "phone", "type": "String", "required": true }
+  ]
+}
+```
+
+Hasil form parent:
+
+```tsx
+<FormArrayTable
+  form={form}
+  name="emergencyContacts"
+  title="Employee Emergency Contacts"
+  addLabel="Add Employee Emergency Contact"
+  createRow={() => ({ name: "", relationship: "", departmentId: "", phone: "" })}
+  columns={[
+    { name: "name", header: "Name", type: "text" },
+    { name: "relationship", header: "Relationship", type: "select", options: [] },
+    { name: "departmentId", header: "Department", type: "lookup", options: [] },
+    { name: "phone", header: "Phone", type: "text" }
+  ]}
+/>
+```
+
+Rekomendasi pemakaian:
+
+- `apiStyle: "root"`: child bisa dikelola dari menu/list sendiri, parent dipilih lewat lookup.
+- `apiStyle: "nested"`: child punya page sendiri di bawah parent dan tampil sebagai tab table di detail/edit parent.
+- `embedInParentDto: true`: child diedit inline di form parent dan ikut submit di payload parent.

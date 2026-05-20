@@ -6,10 +6,11 @@ import { use{{ENTITY_NAME}} } from "../hooks/use-{{ENTITY_KEBAB}}";
 
 export function {{ENTITY_NAME}}DetailPage() {
     const params = useParams();
-    const {{ENTITY_VAR}}Query = use{{ENTITY_NAME}}(params.id);
+{{DETAIL_PARENT_SETUP}}
+    const {{ENTITY_VAR}}Query = use{{ENTITY_NAME}}({{DETAIL_QUERY_ARGS}});
 
     if (!params.id) {
-        return <Navigate to="{{ROUTE_PATH}}" replace />;
+        return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
     }
 
     if ({{ENTITY_VAR}}Query.isLoading) {
@@ -21,7 +22,7 @@ export function {{ENTITY_NAME}}DetailPage() {
     }
 
     if ({{ENTITY_VAR}}Query.isError || !{{ENTITY_VAR}}Query.data) {
-        return <Navigate to="{{ROUTE_PATH}}" replace />;
+        return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
     }
 
     const {{ENTITY_VAR}} = {{ENTITY_VAR}}Query.data;

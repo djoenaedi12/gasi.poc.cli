@@ -8,11 +8,13 @@
   },
   "dependencies": {
     "@gasi/core-api": "*",
+    "@gasi/core-starter": "*",
     "@gasi/core-ui": "*"
   },
   "peerDependencies": {
     "react": ">=19",
-    "react-dom": ">=19"
+    "react-dom": ">=19",
+    "react-router": ">=7"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.1",
