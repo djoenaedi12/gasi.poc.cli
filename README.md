@@ -73,7 +73,7 @@ gasi plugin build hr --target all
 gasi plugin build hr --target all --dry-run
 ```
 
-Web build output langsung ke `platform-app/public/plugins/plugin-hr.umd.js`.
+Web build output ke `plugins/hr-plugin/dist/plugin-hr.umd.js`.
 
 ---
 
@@ -95,8 +95,8 @@ gasi plugin deploy hr --target all
 gasi plugin deploy hr --target all --dry-run
 ```
 
-> Web plugin tidak perlu copy manual karena `vite build` langsung output
-> ke `platform-app/public/plugins/`. Deploy web hanya memverifikasi file ada.
+> Web deploy copy file dari `plugins/hr-plugin/dist/` ke `platform-app/public/plugins/`.
+
 
 ---
 

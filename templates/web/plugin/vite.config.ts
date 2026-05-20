@@ -29,7 +29,7 @@ export default defineConfig({
         },
       },
     },
-    outDir:      '../../platform-app/public/plugins',
-    emptyOutDir: false,
+    outDir:      'dist',
+    emptyOutDir: true,
   },
 });
