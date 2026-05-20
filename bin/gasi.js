@@ -16,7 +16,7 @@ const program = new Command();
 
 program
     .name('gasi')
-    .description('GASI developer toolkit — scaffolding & dev tools for modular Spring Boot + PF4J application')
+    .description('GASI developer toolkit — scaffolding & dev tools for modular application')
     .version(pkg.version);
 
 const plugin = program
@@ -26,22 +26,23 @@ const plugin = program
 plugin
     .command('create')
     .description('Generate a new plugin skeleton following the project conventions')
-    .option('-n, --name <name>', 'Plugin name (example: payroll)')
-    .option('--plugin-prefix <prefix>', 'Optional plugin table prefix, example: auth')
-    .option('-d, --domain <domain>', 'Java domain package name (example: payroll)')
-    .option('-p, --package <package>', 'Base package (default: gasi.gps)')
+    .option('-n, --name <name>', 'Plugin name (example: hr)')
+    .option('-t, --target <target>', 'Generator target: api, web, or all (default: all)', 'all')
+    .option('--plugin-prefix <prefix>', 'Optional plugin table prefix (API only)')
+    .option('-d, --domain <domain>', 'Java domain package name (API only, example: hr)')
+    .option('-p, --package <package>', 'Base package (API only, default: gasi.gps)')
     .option('-v, --plugin-version <version>', 'Plugin version (default: 1.0.0)')
     .option('--description <desc>', 'Plugin description')
     .option(
         '--depends-on <dep>',
-        'Plugin dependency (format: id[@version-constraint][?]). Can be repeated.',
+        'Plugin dependency (API only, format: id[@version][?]). Can be repeated.',
         (val, prev) => prev.concat(val.split(',').map((s) => s.trim()).filter(Boolean)),
         [],
     )
-    .option('--no-flyway', 'Skip generating the Flyway migration sample')
-    .option('--no-register', 'Skip auto-register in parent pom.xml')
+    .option('--no-flyway', 'Skip generating the Flyway migration sample (API only)')
+    .option('--no-register', 'Skip auto-register in parent pom.xml (API only)')
     .option('-y, --yes', 'Skip interactive prompts and use defaults')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
+    .option('--cwd <path>', 'Root project directory (default: current working directory)')
     .action(async (opts) => {
         try {
             await pluginCreate(opts);
@@ -109,7 +110,7 @@ plugin
 
 plugin
     .command('delete <name>')
-    .description('Delete a plugin module and unregister it from the parent pom.xml')
+    .description('Delete a plugin module and unregister it from parent pom.xml')
     .option('--cwd <path>', 'Root project (default: current working directory)')
     .option('--plugins-dir <path>', 'Plugin deployment directory (default: platform-app/plugins)')
     .option('--keep-deployed', 'Keep deployed JARs in the plugins directory')
@@ -123,29 +124,19 @@ plugin
         }
     });
 
-function handleError(err) {
-    console.error(chalk.red('\n✗ Error: ') + err.message);
-    if (process.env.GASI_DEBUG) console.error(err.stack);
-    process.exit(1);
-}
-
-function collect(value, previous) {
-    return previous.concat([value]);
-}
-
 const resource = program
     .command('resource')
     .description('Manage resource scaffolding (entity, service, controller, etc.)');
 
 resource
     .command('create [entityName]')
-    .description('Generate a full CRUD resource (all Clean Architecture layers) inside an existing plugin')
+    .description('Generate a full CRUD resource inside an existing plugin')
     .option('--cwd <path>', 'Root project (default: current working directory)')
     .option('--target <target>', 'Generator target: api, web, or all (default: api)', 'api')
-    .option('--web-dir <path>', 'Frontend project root for --target web/all')
+    .option('--web-dir <path>', 'Frontend plugin root for --target web/all')
     .option('--web-force', 'Overwrite existing generated web files')
     .option('-y, --yes', 'Skip confirmation prompt')
-    .option('-f, --file <file>', 'resource definition file, JSON format. Can be used multiple times.', collect, [])
+    .option('-f, --file <file>', 'Resource definition file, JSON format. Can be repeated.', collect, [])
     .action(async (entityName, opts) => {
         try {
             await resourceCreate(entityName, opts);
@@ -186,6 +177,16 @@ uploader
             handleError(err);
         }
     });
+
+function handleError(err) {
+    console.error(chalk.red('\n✗ Error: ') + err.message);
+    if (process.env.GASI_DEBUG) console.error(err.stack);
+    process.exit(1);
+}
+
+function collect(value, previous) {
+    return previous.concat([value]);
+}
 
 program.parseAsync(process.argv).catch((err) => {
     console.error(chalk.red(err.message));

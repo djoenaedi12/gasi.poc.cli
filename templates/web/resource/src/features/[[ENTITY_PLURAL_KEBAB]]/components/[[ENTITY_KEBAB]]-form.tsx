@@ -2,8 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 {{FORM_IMPORTS}}
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@gasi/core-ui";
+import { Card, CardContent } from "@gasi/core-ui";
 import {
     {{ENTITY_VAR}}CreateSchema,
     type {{ENTITY_NAME}}CreateFormData,

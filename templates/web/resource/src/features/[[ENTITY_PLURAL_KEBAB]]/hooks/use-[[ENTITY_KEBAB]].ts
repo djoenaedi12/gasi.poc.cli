@@ -1,4 +1,4 @@
-import { createBaseHooks } from "@/lib/base-hooks";
+import { createBaseHooks } from "@gasi/core-ui";
 import { {{ENTITY_VAR}}Service } from "../services/{{ENTITY_KEBAB}}-service";
 import type {
     {{ENTITY_NAME}}Summary,

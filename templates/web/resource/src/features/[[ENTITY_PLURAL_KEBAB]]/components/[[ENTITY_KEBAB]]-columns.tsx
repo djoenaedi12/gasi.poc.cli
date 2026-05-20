@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { getDataTableRowActionsColumn } from "@/components/datatable/data-table-row-actions";
+import { getDataTableRowActionsColumn } from "@gasi/core-ui";
 import type { {{ENTITY_NAME}}Summary } from "../types/{{ENTITY_KEBAB}}.types";
 
 type {{ENTITY_NAME}}ColumnsOptions = {

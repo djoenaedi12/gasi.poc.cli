@@ -1,7 +1,7 @@
 import { Navigate, useParams } from "react-router";
 
-import { PageHeader } from "@/components/molecules/page-header";
-import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@gasi/core-ui";
+import { Card, CardContent } from "@gasi/core-ui";
 import { use{{ENTITY_NAME}} } from "../hooks/use-{{ENTITY_KEBAB}}";
 
 export function {{ENTITY_NAME}}DetailPage() {

@@ -1,4 +1,4 @@
-import { createBaseService } from "@/lib/base-service";
+import { createBaseService } from "@gasi/core-ui";
 import type {
     {{ENTITY_NAME}}CreateRequest,
     {{ENTITY_NAME}}Detail,

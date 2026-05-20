@@ -1,6 +1,6 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 
-import { PageHeader } from "@/components/molecules/page-header";
+import { PageHeader } from "@gasi/core-ui";
 import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_KEBAB}}-form";
 import { use{{ENTITY_NAME}}, useUpdate{{ENTITY_NAME}} } from "../hooks/use-{{ENTITY_KEBAB}}";
 import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_KEBAB}}-update-schema";

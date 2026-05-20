@@ -2,11 +2,11 @@ import { Plus, Upload } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router";
 
-import { DataTableBulkDeleteAction } from "@/components/datatable/data-table-bulk-delete-action";
-import { ServerDataTable } from "@/components/datatable/data-table";
-import { PageHeader } from "@/components/molecules/page-header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { DataTableBulkDeleteAction } from "@gasi/core-ui";
+import { ServerDataTable } from "@gasi/core-ui";
+import { PageHeader } from "@gasi/core-ui";
+import { Button } from "@gasi/core-ui";
+import { Card, CardContent } from "@gasi/core-ui";
 import { get{{ENTITY_NAME}}Columns } from "../components/{{ENTITY_KEBAB}}-columns";
 import { useDelete{{ENTITY_NAME}}, use{{ENTITY_PLURAL_PASCAL}}Page } from "../hooks/use-{{ENTITY_KEBAB}}";
 

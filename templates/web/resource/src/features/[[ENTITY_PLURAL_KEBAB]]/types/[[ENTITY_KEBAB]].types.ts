@@ -1,4 +1,4 @@
-export type { ApiResponse, SearchRequest, PageResult } from "@/types/api.types";
+export type { ApiResponse, SearchRequest, PageResult } from "@gasi/core-ui";
 
 export type {{ENTITY_NAME}}Summary = {
     id: string;
