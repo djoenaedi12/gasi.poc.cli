@@ -10,15 +10,26 @@ npm install -g .
 node bin/gasi.js
 ```
 
+---
+
 ## Commands
+
+Semua command plugin mendukung `--target api | web | all`.
+
+| Target | Keterangan |
+|---|---|
+| `api` | Hanya Spring Boot + PF4J (Maven) |
+| `web` | Hanya React + Vite (npm) |
+| `all` | Keduanya sekaligus |
+
+---
 
 ### `gasi plugin create`
 
-Generate skeleton plugin baru. Mendukung target **api** (Spring Boot + PF4J),
-**web** (React + Vite monorepo), atau **all** (keduanya).
+Generate skeleton plugin baru.
 
 ```bash
-# Interactive — akan ditanya target, nama, versi, dll
+# Interactive (default target: all)
 gasi plugin create
 
 # Web plugin saja
@@ -27,52 +38,121 @@ gasi plugin create --target web --name hr
 # API plugin saja
 gasi plugin create --target api --name hr
 
-# Keduanya (default)
-gasi plugin create --target all --name hr
-
-# Non-interactive
-gasi plugin create --target web --name hr --description "HR Module" -y
+# Keduanya
+gasi plugin create --target all --name hr -y
 ```
-
-**Options:**
-
-| Flag | Keterangan |
-|---|---|
-| `-n, --name` | Nama plugin (tanpa suffix `-plugin`) |
-| `-t, --target` | `api`, `web`, atau `all` (default: `all`) |
-| `-v, --plugin-version` | Versi plugin (default: `1.0.0`) |
-| `--description` | Deskripsi plugin |
-| `-d, --domain` | Java domain package (API only) |
-| `-p, --package` | Base Java package (API only, default: `gasi.gps`) |
-| `--depends-on` | Plugin dependency PF4J (API only) |
-| `--no-flyway` | Skip Flyway migration sample (API only) |
-| `--no-register` | Skip register ke parent pom.xml (API only) |
-| `-y, --yes` | Skip semua prompt, pakai defaults |
-| `--cwd` | Root project directory |
 
 **Output web plugin** (`plugins/hr-plugin/`):
 ```
 plugins/hr-plugin/
 ├── src/
-│   ├── features/
-│   │   └── hr/
-│   │       └── routes.tsx     ← entry point routes, tambahkan sub-feature di sini
-│   └── index.ts               ← register plugin ke pluginRegistry
-├── package.json               ← @gasi/plugin-hr
-├── vite.config.ts             ← build UMD → platform-app/public/plugins/
+│   ├── features/hr/routes.tsx   ← entry point routes
+│   └── index.ts                 ← register ke pluginRegistry
+├── package.json
+├── vite.config.ts               ← build UMD → platform-app/public/plugins/
 └── tsconfig.json
 ```
 
-**Setelah generate web plugin:**
+---
+
+### `gasi plugin build <name>`
+
+Build plugin.
+
 ```bash
-# Build plugin
-npm run build -w plugins/hr-plugin
+# Build web saja
+gasi plugin build hr --target web
 
-# Daftarkan di platform-app/src/main.tsx
-await loadAndStartPlugins(['/plugins/plugin-hr.umd.js']);
+# Build API saja
+gasi plugin build hr --target api
 
-# Tambah feature/resource
-gasi resource create --target web --web-dir plugins/hr-plugin
+# Build keduanya
+gasi plugin build hr --target all
+
+# Dry run
+gasi plugin build hr --target all --dry-run
+```
+
+Web build output langsung ke `platform-app/public/plugins/plugin-hr.umd.js`.
+
+---
+
+### `gasi plugin deploy <name>`
+
+Deploy plugin ke platform.
+
+```bash
+# Deploy API (copy JAR → platform-app/plugins/)
+gasi plugin deploy hr --target api
+
+# Deploy Web (verifikasi bundle ada di platform-app/public/plugins/)
+gasi plugin deploy hr --target web
+
+# Keduanya
+gasi plugin deploy hr --target all
+
+# Dry run
+gasi plugin deploy hr --target all --dry-run
+```
+
+> Web plugin tidak perlu copy manual karena `vite build` langsung output
+> ke `platform-app/public/plugins/`. Deploy web hanya memverifikasi file ada.
+
+---
+
+### `gasi plugin clean <name>`
+
+Hapus deployed files dari platform.
+
+```bash
+# Hapus JAR dari platform-app/plugins/
+gasi plugin clean hr --target api
+
+# Hapus .umd.js dari platform-app/public/plugins/
+gasi plugin clean hr --target web
+
+# Keduanya
+gasi plugin clean hr --target all
+
+# Dry run
+gasi plugin clean hr --target all --dry-run
+```
+
+---
+
+### `gasi plugin delete <name>`
+
+Hapus folder plugin dan semua deployed files.
+
+```bash
+# Hapus API plugin
+gasi plugin delete hr --target api
+
+# Hapus web plugin
+gasi plugin delete hr --target web
+
+# Hapus keduanya
+gasi plugin delete hr --target all
+
+# Skip konfirmasi
+gasi plugin delete hr --target all -y
+
+# Dry run
+gasi plugin delete hr --target all --dry-run
+```
+
+Delete plan yang ditampilkan sebelum eksekusi:
+```
+Delete plan:
+
+  API:
+    Unregister from : pom.xml
+    Remove dir      : plugins/hr-plugin
+    Remove JAR      : platform-app/plugins/hr-plugin-1.0.0.jar
+
+  Web:
+    Remove dir      : plugins/hr-plugin
+    Remove bundle   : platform-app/public/plugins/plugin-hr.umd.js
 ```
 
 ---
@@ -87,57 +167,12 @@ gasi plugin list
 
 ---
 
-### `gasi plugin build <name>`
-
-Build plugin API dengan Maven.
-
-```bash
-gasi plugin build hr
-gasi plugin build hr --skip-tests
-gasi plugin build hr --dry-run
-```
-
----
-
-### `gasi plugin deploy <name>`
-
-Copy JAR hasil build ke folder `platform-app/plugins/`.
-
-```bash
-gasi plugin deploy hr
-gasi plugin deploy hr --dry-run
-```
-
----
-
-### `gasi plugin clean <name>`
-
-Hapus JAR yang sudah di-deploy dari `platform-app/plugins/`.
-
-```bash
-gasi plugin clean hr
-```
-
----
-
-### `gasi plugin delete <name>`
-
-Hapus folder plugin dan unregister dari `pom.xml`.
-
-```bash
-gasi plugin delete hr
-gasi plugin delete hr --dry-run
-```
-
----
-
 ### `gasi resource create`
 
-Generate full CRUD resource (entity, service, controller, pages, hooks, dll)
-di dalam plugin yang sudah ada.
+Generate full CRUD resource di dalam plugin yang sudah ada.
 
 ```bash
-# API resource (default)
+# API resource
 gasi resource create Employee --cwd plugins/hr-plugin
 
 # Web resource di dalam plugin
@@ -161,7 +196,7 @@ gasi resource delete Employee
 
 ### `gasi uploader create <name>`
 
-Generate `DataUplProcessor` untuk upload data di dalam plugin.
+Generate `DataUplProcessor` untuk upload data.
 
 ```bash
 gasi uploader create Employee --plugin hr
@@ -170,8 +205,6 @@ gasi uploader create Employee --plugin hr
 ---
 
 ## Resource Definition File
-
-Gunakan file JSON untuk mendefinisikan entity dengan field-fieldnya:
 
 ```json
 {
@@ -187,5 +220,4 @@ Gunakan file JSON untuk mendefinisikan entity dengan field-fieldnya:
 }
 ```
 
-**Tipe field yang didukung:**
-`String`, `Integer`, `Long`, `BigDecimal`, `Double`, `Boolean`, `Date`, `DateTime`, `Instant`, `ManyToOne`, `Enum`
+**Tipe field:** `String`, `Integer`, `Long`, `BigDecimal`, `Double`, `Boolean`, `Date`, `DateTime`, `Instant`, `ManyToOne`, `Enum`

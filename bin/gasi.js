@@ -25,138 +25,111 @@ const plugin = program
 
 plugin
     .command('create')
-    .description('Generate a new plugin skeleton following the project conventions')
+    .description('Generate a new plugin skeleton')
     .option('-n, --name <name>', 'Plugin name (example: hr)')
     .option('-t, --target <target>', 'Generator target: api, web, or all (default: all)', 'all')
     .option('--plugin-prefix <prefix>', 'Optional plugin table prefix (API only)')
-    .option('-d, --domain <domain>', 'Java domain package name (API only, example: hr)')
+    .option('-d, --domain <domain>', 'Java domain package name (API only)')
     .option('-p, --package <package>', 'Base package (API only, default: gasi.gps)')
     .option('-v, --plugin-version <version>', 'Plugin version (default: 1.0.0)')
     .option('--description <desc>', 'Plugin description')
     .option(
         '--depends-on <dep>',
-        'Plugin dependency (API only, format: id[@version][?]). Can be repeated.',
+        'Plugin dependency (API only). Can be repeated.',
         (val, prev) => prev.concat(val.split(',').map((s) => s.trim()).filter(Boolean)),
         [],
     )
-    .option('--no-flyway', 'Skip generating the Flyway migration sample (API only)')
+    .option('--no-flyway', 'Skip Flyway migration sample (API only)')
     .option('--no-register', 'Skip auto-register in parent pom.xml (API only)')
     .option('-y, --yes', 'Skip interactive prompts and use defaults')
-    .option('--cwd <path>', 'Root project directory (default: current working directory)')
+    .option('--cwd <path>', 'Root project directory (default: cwd)')
     .action(async (opts) => {
-        try {
-            await pluginCreate(opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await pluginCreate(opts); } catch (err) { handleError(err); }
     });
 
 plugin
     .command('list')
     .description('List plugin modules registered in the parent pom.xml')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
+    .option('--cwd <path>', 'Root project (default: cwd)')
     .action(async (opts) => {
-        try {
-            await pluginList(opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await pluginList(opts); } catch (err) { handleError(err); }
     });
 
 plugin
     .command('build <name>')
-    .description('Build a plugin module with Maven')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
-    .option('--skip-tests', 'Skip tests during Maven build')
-    .option('--profile <name>', 'Maven profile to activate')
-    .option('--dry-run', 'Print the Maven command without running it')
-    .option('--verbose', 'Show full Maven output')
+    .description('Build a plugin')
+    .option('-t, --target <target>', 'Build target: api, web, or all (default: api)', 'api')
+    .option('--cwd <path>', 'Root project (default: cwd)')
+    .option('--skip-tests', 'Skip tests during Maven build (API only)')
+    .option('--profile <name>', 'Maven profile to activate (API only)')
+    .option('--dry-run', 'Print commands without running them')
+    .option('--verbose', 'Show full Maven output (API only)')
     .action(async (name, opts) => {
-        try {
-            await pluginBuild(name, opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await pluginBuild(name, opts); } catch (err) { handleError(err); }
     });
 
 plugin
     .command('deploy <name>')
-    .description('Copy a built plugin JAR into the platform plugins directory')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
-    .option('--plugins-dir <path>', 'Plugin deployment directory (default: platform-app/plugins)')
-    .option('--keep-old', 'Keep older deployed JARs for this plugin')
+    .description('Deploy a built plugin to the platform')
+    .option('-t, --target <target>', 'Deploy target: api, web, or all (default: api)', 'api')
+    .option('--cwd <path>', 'Root project (default: cwd)')
+    .option('--plugins-dir <path>', 'Override plugin deployment directory')
+    .option('--keep-old', 'Keep older deployed JARs (API only)')
+    .option('--keep-deployed', 'Skip removing deployed files on delete')
     .option('--dry-run', 'Print deploy actions without changing files')
     .action(async (name, opts) => {
-        try {
-            await pluginDeploy(name, opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await pluginDeploy(name, opts); } catch (err) { handleError(err); }
     });
 
 plugin
     .command('clean <name>')
-    .description('Remove deployed plugin JARs from the platform plugins directory')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
-    .option('--plugins-dir <path>', 'Plugin deployment directory (default: platform-app/plugins)')
+    .description('Remove deployed plugin files from the platform')
+    .option('-t, --target <target>', 'Clean target: api, web, or all (default: api)', 'api')
+    .option('--cwd <path>', 'Root project (default: cwd)')
+    .option('--plugins-dir <path>', 'Override plugin deployment directory')
     .option('--dry-run', 'Print clean actions without changing files')
     .action(async (name, opts) => {
-        try {
-            await pluginClean(name, opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await pluginClean(name, opts); } catch (err) { handleError(err); }
     });
 
 plugin
     .command('delete <name>')
-    .description('Delete a plugin module and unregister it from parent pom.xml')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
-    .option('--plugins-dir <path>', 'Plugin deployment directory (default: platform-app/plugins)')
-    .option('--keep-deployed', 'Keep deployed JARs in the plugins directory')
+    .description('Delete a plugin and remove its deployed files')
+    .option('-t, --target <target>', 'Delete target: api, web, or all (default: api)', 'api')
+    .option('--cwd <path>', 'Root project (default: cwd)')
+    .option('--plugins-dir <path>', 'Override plugin deployment directory')
+    .option('--keep-deployed', 'Keep deployed files when deleting')
     .option('--dry-run', 'Print delete actions without changing files')
     .option('-y, --yes', 'Skip confirmation prompt')
     .action(async (name, opts) => {
-        try {
-            await pluginDelete(name, opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await pluginDelete(name, opts); } catch (err) { handleError(err); }
     });
 
 const resource = program
     .command('resource')
-    .description('Manage resource scaffolding (entity, service, controller, etc.)');
+    .description('Manage resource scaffolding');
 
 resource
     .command('create [entityName]')
     .description('Generate a full CRUD resource inside an existing plugin')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
+    .option('--cwd <path>', 'Root project (default: cwd)')
     .option('--target <target>', 'Generator target: api, web, or all (default: api)', 'api')
     .option('--web-dir <path>', 'Frontend plugin root for --target web/all')
     .option('--web-force', 'Overwrite existing generated web files')
     .option('-y, --yes', 'Skip confirmation prompt')
-    .option('-f, --file <file>', 'Resource definition file, JSON format. Can be repeated.', collect, [])
+    .option('-f, --file <file>', 'Resource definition file (JSON). Can be repeated.', collect, [])
     .action(async (entityName, opts) => {
-        try {
-            await resourceCreate(entityName, opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await resourceCreate(entityName, opts); } catch (err) { handleError(err); }
     });
 
 resource
     .command('delete <entityName>')
-    .description('Delete all generated resource files for an entity from an existing plugin')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
+    .description('Delete all generated resource files for an entity')
+    .option('--cwd <path>', 'Root project (default: cwd)')
     .option('--include-migration', 'Also delete Flyway migration SQL files')
     .option('-y, --yes', 'Skip confirmation prompt')
     .action(async (entityName, opts) => {
-        try {
-            await resourceDelete(entityName, opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await resourceDelete(entityName, opts); } catch (err) { handleError(err); }
     });
 
 const uploader = program
@@ -165,17 +138,13 @@ const uploader = program
 
 uploader
     .command('create <name>')
-    .description('Generate a resource-specific DataUplProcessor inside an existing plugin')
-    .option('--cwd <path>', 'Root project (default: current working directory)')
-    .option('--plugin <name>', 'Target plugin name, example: employee or employee-plugin')
-    .option('--resource <name>', 'Upload API resource name (default: kebab-case of name)')
+    .description('Generate a DataUplProcessor inside an existing plugin')
+    .option('--cwd <path>', 'Root project (default: cwd)')
+    .option('--plugin <name>', 'Target plugin name')
+    .option('--resource <name>', 'Upload API resource name')
     .option('-y, --yes', 'Skip confirmation prompt')
     .action(async (name, opts) => {
-        try {
-            await uploaderCreate(name, opts);
-        } catch (err) {
-            handleError(err);
-        }
+        try { await uploaderCreate(name, opts); } catch (err) { handleError(err); }
     });
 
 function handleError(err) {
