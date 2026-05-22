@@ -4,6 +4,6 @@ import type {
     {{ENTITY_NAME}}Detail,
     {{ENTITY_NAME}}Summary,
     {{ENTITY_NAME}}UpdateRequest,
-} from "../types/{{ENTITY_KEBAB}}.types";
+} from "../types/{{ENTITY_VAR}}.types";
 
 {{SERVICE_EXPORT}}

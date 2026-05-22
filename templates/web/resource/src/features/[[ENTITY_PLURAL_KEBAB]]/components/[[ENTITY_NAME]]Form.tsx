@@ -1,17 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 {{FORM_IMPORTS}}
 import { Button } from "@gasi/core-ui";
-import { Card, CardContent } from "@gasi/core-ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@gasi/core-ui";
 import {
     {{ENTITY_VAR}}CreateSchema,
     type {{ENTITY_NAME}}CreateFormData,
-} from "../schemas/{{ENTITY_KEBAB}}-create-schema";
+} from "../schemas/{{ENTITY_VAR}}CreateSchema";
 import {
     {{ENTITY_VAR}}UpdateSchema,
     type {{ENTITY_NAME}}UpdateFormData,
-} from "../schemas/{{ENTITY_KEBAB}}-update-schema";
+} from "../schemas/{{ENTITY_VAR}}UpdateSchema";
 
 type {{ENTITY_NAME}}FormProps =
     | {
@@ -41,7 +42,7 @@ export function {{ENTITY_NAME}}Form(props: {{ENTITY_NAME}}FormProps) {
         <Card>
             <CardContent>
                 <form onSubmit={form.handleSubmit(props.onSubmit)} className="space-y-6">
-                    <div className="grid max-w-3xl gap-5">
+                    <div className="grid gap-5">
 {{FORM_FIELDS}}
                     </div>
 
@@ -50,6 +51,7 @@ export function {{ENTITY_NAME}}Form(props: {{ENTITY_NAME}}FormProps) {
                             Cancel
                         </Button>
                         <FormButton loading={form.formState.isSubmitting}>
+                            <Save className="size-4" />
                             {props.submitLabel}
                         </FormButton>
                     </div>

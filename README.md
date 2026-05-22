@@ -184,6 +184,30 @@ gasi resource create Employee --target web --web-dir plugins/hr-plugin
 gasi resource create --target web --web-dir plugins/hr-plugin -f resource.json
 ```
 
+**Output web resource** mengikuti naming convention `gasi.poc.web`:
+
+```
+src/features/employees/
+├── components/
+│   ├── EmployeeColumns.tsx
+│   └── EmployeeForm.tsx
+├── hooks/
+│   └── useEmployee.ts
+├── pages/
+│   ├── EmployeeCreatePage.tsx
+│   ├── EmployeeDetailPage.tsx
+│   ├── EmployeeEditPage.tsx
+│   └── EmployeeListPage.tsx
+├── schemas/
+│   ├── employeeCreateSchema.ts
+│   └── employeeUpdateSchema.ts
+├── services/
+│   └── employeeService.ts
+├── types/
+│   └── employee.types.ts
+└── routes.tsx
+```
+
 ---
 
 ### `gasi resource delete <entityName>`
@@ -211,6 +235,8 @@ gasi uploader create Employee --plugin hr
 ```json
 {
   "entityName": "Employee",
+  "mode": "crud",
+  "identifier": ["employeeNo", "fullName"],
   "basePath": "/hr/employees",
   "fields": [
     { "name": "employeeNo", "type": "String",  "required": true,  "dto": { "summary": true, "detail": true, "create": true, "update": true }, "filterable": true },
@@ -223,6 +249,31 @@ gasi uploader create Employee --plugin hr
 ```
 
 **Tipe field:** `String`, `Integer`, `Long`, `BigDecimal`, `Double`, `Boolean`, `Date`, `DateTime`, `Instant`, `ManyToOne`, `Enum`
+
+`mode` bersifat opsional dan default-nya `crud`.
+
+- `mode: "crud"`: generator API memakai base write+read (`BaseService`/`BaseServiceImpl`/`BaseController`). Generator web membuat list, detail, create, edit, form, schema, tombol add/edit/delete, dan bulk action sesuai permission.
+- `mode: "read"`: generator API memakai read-only base (`BaseReadService`/`BaseReadServiceImpl`/`BaseReadController`). Generator web hanya membuat list dan detail. List tetap punya search/filter/sort/pagination/export dan row action view/detail, tetapi tidak membuat tombol add, edit, delete, bulk delete, upload, create page, edit page, form, atau schema create/update.
+
+Contoh read-only resource:
+
+```json
+{
+  "entityName": "AuditLog",
+  "mode": "read",
+  "identifier": ["eventType", "actor"],
+  "fields": [
+    { "name": "eventType", "type": "String", "required": true, "filterable": true },
+    { "name": "actor", "type": "String", "required": false, "filterable": true },
+    { "name": "resourceName", "type": "String", "required": true, "filterable": true },
+    { "name": "createdAt", "type": "Instant", "required": true, "filterable": true }
+  ]
+}
+```
+
+`identifier` bersifat opsional dan dipakai web generator untuk mengganti segment ID di breadcrumb detail/edit. Bisa string tunggal atau array field, misalnya `"identifier": "code"` atau `"identifier": ["code", "name"]`. Field yang dipakai harus ikut di DTO detail.
+
+Untuk web table, `filterable: true` pada `String`, `Text`, dan `MediumText` masuk ke global `searchFields`. Field relasi seperti `ManyToOne` tidak masuk global search; field itu disiapkan untuk jalur more filter/lookup agar user memilih record referensi, bukan mengetik ID.
 
 Resource child bisa menambahkan `parent` tanpa mendefinisikan field parent secara manual. CLI otomatis menambahkan relasi `ManyToOne` dengan nama field lower-camel dari parent, misalnya `parent: "Employee"` menjadi field domain `employee` dan DTO field `employeeId`.
 

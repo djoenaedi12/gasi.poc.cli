@@ -1,7 +1,7 @@
 import type { RouteDefinition } from '@gasi/core-api';
 
 // Import halaman-halaman feature di sini
-// import { {{PLUGIN_TITLE}}ListPage } from './pages/{{PLUGIN_NAME}}-list-page';
+// import { {{PLUGIN_NAME_PASCAL}}ListPage } from './pages/{{PLUGIN_NAME_PASCAL}}ListPage';
 
 /**
  * Daftarkan semua routes dari setiap feature di plugin ini.

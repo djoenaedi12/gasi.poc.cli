@@ -2,6 +2,8 @@
   "resources": [
     {
       "entityName": "Department",
+      "mode": "crud",
+      "identifier": ["code", "name"],
       "fields": [
         {
           "name": "code",
@@ -49,6 +51,7 @@
     },
     {
       "entityName": "JobTitle",
+      "mode": "read",
       "fields": [
         {
           "name": "code",
@@ -92,6 +95,7 @@
     },
     {
       "entityName": "Employee",
+      "mode": "crud",
       "fields": [
         {
           "name": "employeeNo",
@@ -287,6 +291,7 @@
     },
     {
       "entityName": "EmployeeEmergencyContact",
+      "mode": "crud",
       "parent": "Employee",
       "as": "emergencyContacts",
       "embedInParentDto": true,
@@ -344,6 +349,7 @@
     },
     {
       "entityName": "EmployeeAddress",
+      "mode": "crud",
       "parent": "Employee",
       "apiStyle": "nested",
       "embedInParentDto": false,
@@ -403,6 +409,7 @@
     },
     {
       "entityName": "EmployeeAsset",
+      "mode": "crud",
       "parent": "Employee",
       "apiStyle": "root",
       "embedInParentDto": false,
