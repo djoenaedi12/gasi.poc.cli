@@ -13,6 +13,11 @@
           "unique": true,
           "filterable": true,
           "defaultColumn": true,
+          "ui": {
+            "table": {
+              "searchable": true
+            }
+          },
           "validation": {
             "minLength": 2,
             "maxLength": 50,
@@ -27,6 +32,11 @@
           "required": true,
           "filterable": true,
           "defaultColumn": true,
+          "ui": {
+            "table": {
+              "searchable": true
+            }
+          },
           "validation": {
             "minLength": 3,
             "maxLength": 150
@@ -61,6 +71,11 @@
           "unique": true,
           "filterable": true,
           "defaultColumn": true,
+          "ui": {
+            "table": {
+              "searchable": true
+            }
+          },
           "validation": {
             "minLength": 2,
             "maxLength": 50,
@@ -75,6 +90,11 @@
           "required": true,
           "filterable": true,
           "defaultColumn": true,
+          "ui": {
+            "table": {
+              "searchable": true
+            }
+          },
           "validation": {
             "minLength": 3,
             "maxLength": 150
@@ -86,6 +106,14 @@
           "required": true,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover"
+              }
+            }
+          },
           "validation": {
             "min": 1,
             "max": 20
@@ -105,6 +133,11 @@
           "unique": true,
           "filterable": true,
           "defaultColumn": true,
+          "ui": {
+            "table": {
+              "searchable": true
+            }
+          },
           "validation": {
             "minLength": 3,
             "maxLength": 50,
@@ -119,6 +152,11 @@
           "required": true,
           "filterable": true,
           "defaultColumn": true,
+          "ui": {
+            "table": {
+              "searchable": true
+            }
+          },
           "validation": {
             "minLength": 3,
             "maxLength": 150
@@ -178,6 +216,14 @@
           "required": true,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover"
+              }
+            }
+          },
           "validation": {
             "min": 18,
             "max": 65
@@ -190,6 +236,14 @@
           "unique": true,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover"
+              }
+            }
+          },
           "validation": {
             "positive": true
           }
@@ -200,6 +254,14 @@
           "required": true,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover"
+              }
+            }
+          },
           "validation": {
             "decimalMin": "0.00",
             "decimalMax": "999999999.99",
@@ -215,6 +277,14 @@
           "required": false,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover"
+              }
+            }
+          },
           "validation": {
             "decimalMin": "0.00",
             "decimalMax": "100.00"
@@ -225,7 +295,15 @@
           "type": "Boolean",
           "required": true,
           "filterable": true,
-          "defaultColumn": false
+          "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "toolbar"
+              }
+            }
+          }
         },
         {
           "name": "birthDate",
@@ -233,6 +311,15 @@
           "required": true,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover",
+                "type": "date-range"
+              }
+            }
+          },
           "validation": {
             "past": true
           }
@@ -243,6 +330,15 @@
           "required": true,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover",
+                "type": "date-range"
+              }
+            }
+          },
           "validation": {
             "pastOrPresent": true
           }
@@ -253,6 +349,15 @@
           "required": false,
           "filterable": true,
           "defaultColumn": false,
+          "ui": {
+            "table": {
+              "filter": {
+                "enabled": true,
+                "placement": "popover",
+                "type": "date-range"
+              }
+            }
+          },
           "dto": {
             "create": false,
             "update": false,

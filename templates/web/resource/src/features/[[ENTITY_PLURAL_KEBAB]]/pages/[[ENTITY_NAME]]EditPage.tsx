@@ -1,6 +1,6 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 
-import { PageHeader, Tabs, TabsContent, TabsList, TabsTrigger } from "@gasi/core-ui";
+import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, useI18n } from "@gasi/core-ui";
 import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";
 import { use{{ENTITY_NAME}}, useUpdate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_NAME}}";
 import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_VAR}}UpdateSchema";
@@ -8,9 +8,11 @@ import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_VAR}}Upd
 export function {{ENTITY_NAME}}EditPage() {
     const navigate = useNavigate();
     const params = useParams();
+    const { t } = useI18n();
 {{EDIT_PARENT_SETUP}}
     const {{ENTITY_VAR}}Query = use{{ENTITY_NAME}}({{DETAIL_QUERY_ARGS}});
     const update{{ENTITY_NAME}} = useUpdate{{ENTITY_NAME}}({{UPDATE_HOOK_ARGS}});
+    const singularEntity = t("{{I18N_KEY_PREFIX}}.names.singular");
 
     if (!params.id) {
         return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
@@ -24,7 +26,10 @@ export function {{ENTITY_NAME}}EditPage() {
     if ({{ENTITY_VAR}}Query.isLoading) {
         return (
             <div className="flex flex-col gap-6">
-                <PageHeader title="Edit {{ENTITY_NAME}}" description="Loading {{ENTITY_VAR_TITLE}} data." />
+                <PageHeader
+                    title={t("common.titles.editEntity", { entity: singularEntity })}
+                    description={t("common.descriptions.loadingEntityData", { entity: singularEntity })}
+                />
             </div>
         );
     }
@@ -39,25 +44,25 @@ export function {{ENTITY_NAME}}EditPage() {
     return (
         <div className="flex flex-col gap-6">
             <PageHeader
-                title="Edit {{ENTITY_NAME}}"
-                description="Update {{ENTITY_VAR_TITLE}} data."
+                title={t("common.titles.editEntity", { entity: singularEntity })}
+                description={t("common.descriptions.updateEntity", { entity: singularEntity })}
                 breadcrumbLabels={{ [params.id as string]: breadcrumbLabel }}
             />
-            <Tabs defaultValue="general">
-                <TabsList>
-                    <TabsTrigger value="general">General</TabsTrigger>
-                </TabsList>
+            <CardTabs defaultValue="general" className="w-full max-w-3xl">
+                <CardTabsList>
+                    <CardTabsTrigger value="general">{t("common.tabs.general")}</CardTabsTrigger>
+                </CardTabsList>
 
-                <TabsContent value="general" className="max-w-3xl">
+                <CardTabsContent value="general">
                     <{{ENTITY_NAME}}Form
                         mode="edit"
                         defaultValues={{{ENTITY_VAR}}}
-                        submitLabel={update{{ENTITY_NAME}}.isPending ? "Saving..." : "Save"}
+                        submitLabel={update{{ENTITY_NAME}}.isPending ? t("common.actions.saving") : t("common.actions.save")}
                         onCancel={() => navigate({{NAVIGATE_LIST}})}
                         onSubmit={handleSubmit}
                     />
-                </TabsContent>
-            </Tabs>
+                </CardTabsContent>
+            </CardTabs>
         </div>
     );
 }

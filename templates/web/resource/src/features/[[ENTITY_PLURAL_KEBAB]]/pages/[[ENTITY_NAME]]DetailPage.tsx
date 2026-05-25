@@ -6,15 +6,17 @@ import { {{DETAIL_ROUTER_IMPORTS}} } from "react-router";
 import { PageHeader } from "@gasi/core-ui";
 {{DETAIL_BUTTON_IMPORT}}
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@gasi/core-ui";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@gasi/core-ui";
+import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, useI18n } from "@gasi/core-ui";
 import { use{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_NAME}}";
 
 export function {{ENTITY_NAME}}DetailPage() {
 {{DETAIL_NAVIGATE_SETUP}}
     const params = useParams();
+    const { t } = useI18n();
 {{DETAIL_PARENT_SETUP}}
     const {{ENTITY_VAR}}Query = use{{ENTITY_NAME}}({{DETAIL_QUERY_ARGS}});
 {{DETAIL_PERMISSION_SETUP}}
+    const singularEntity = t("{{I18N_KEY_PREFIX}}.names.singular");
 
     if (!params.id) {
         return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
@@ -23,7 +25,10 @@ export function {{ENTITY_NAME}}DetailPage() {
     if ({{ENTITY_VAR}}Query.isLoading) {
         return (
             <div className="flex flex-col gap-6">
-                <PageHeader title="{{ENTITY_NAME}} Detail" description="Loading {{ENTITY_VAR_TITLE}} data." />
+                <PageHeader
+                    title={t("common.titles.detailEntity", { entity: singularEntity })}
+                    description={t("common.descriptions.loadingEntityData", { entity: singularEntity })}
+                />
             </div>
         );
     }
@@ -38,23 +43,23 @@ export function {{ENTITY_NAME}}DetailPage() {
     return (
         <div className="flex flex-col gap-6">
             <PageHeader
-                title="{{ENTITY_NAME}} Detail"
-                description={`Detail for ID: ${params.id}`}
+                title={t("common.titles.detailEntity", { entity: singularEntity })}
+                description={t("common.descriptions.detailById", { id: params.id })}
                 breadcrumbLabels={{ [params.id as string]: breadcrumbLabel }}
                 {{DETAIL_ACTIONS}}
             />
 
-            <Tabs defaultValue="general">
-                <TabsList>
-                    <TabsTrigger value="general">General</TabsTrigger>
-                </TabsList>
+            <CardTabs defaultValue="general" className="w-full max-w-3xl">
+                <CardTabsList>
+                    <CardTabsTrigger value="general">{t("common.tabs.general")}</CardTabsTrigger>
+                </CardTabsList>
 
-                <TabsContent value="general" className="max-w-3xl">
+                <CardTabsContent value="general">
                     <Card>
                         <CardHeader>
-                            <CardTitle>General</CardTitle>
+                            <CardTitle>{t("common.tabs.general")}</CardTitle>
                             <CardDescription>
-                                Basic {{ENTITY_VAR_TITLE}} information used across the application.
+                                {t("common.descriptions.generalEntityInfo", { entity: singularEntity })}
                             </CardDescription>
                         </CardHeader>
 
@@ -64,8 +69,8 @@ export function {{ENTITY_NAME}}DetailPage() {
                             </dl>
                         </CardContent>
                     </Card>
-                </TabsContent>
-            </Tabs>
+                </CardTabsContent>
+            </CardTabs>
         </div>
     );
 }

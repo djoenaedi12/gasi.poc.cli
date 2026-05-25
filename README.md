@@ -239,11 +239,62 @@ gasi uploader create Employee --plugin hr
   "identifier": ["employeeNo", "fullName"],
   "basePath": "/hr/employees",
   "fields": [
-    { "name": "employeeNo", "type": "String",  "required": true,  "dto": { "summary": true, "detail": true, "create": true, "update": true }, "filterable": true },
-    { "name": "fullName",   "type": "String",  "required": true,  "dto": { "summary": true, "detail": true, "create": true, "update": true }, "filterable": true },
+    {
+      "name": "employeeNo",
+      "type": "String",
+      "required": true,
+      "dto": { "summary": true, "detail": true, "create": true, "update": true },
+      "filterable": true,
+      "ui": {
+        "table": {
+          "searchable": true
+        }
+      }
+    },
+    {
+      "name": "fullName",
+      "type": "String",
+      "required": true,
+      "dto": { "summary": true, "detail": true, "create": true, "update": true },
+      "filterable": true,
+      "ui": {
+        "table": {
+          "searchable": true
+        }
+      }
+    },
     { "name": "email",      "type": "String",  "required": false, "dto": { "summary": false,"detail": true, "create": true, "update": true }, "validation": { "email": true } },
-    { "name": "joinDate",   "type": "Date",    "required": false, "dto": { "summary": true, "detail": true, "create": true, "update": true } },
-    { "name": "isActive",   "type": "Boolean", "required": true,  "dto": { "summary": true, "detail": true, "create": true, "update": true } }
+    {
+      "name": "joinDate",
+      "type": "Date",
+      "required": false,
+      "dto": { "summary": true, "detail": true, "create": true, "update": true },
+      "filterable": true,
+      "ui": {
+        "table": {
+          "filter": {
+            "enabled": true,
+            "placement": "popover",
+            "type": "date-range"
+          }
+        }
+      }
+    },
+    {
+      "name": "isActive",
+      "type": "Boolean",
+      "required": true,
+      "dto": { "summary": true, "detail": true, "create": true, "update": true },
+      "filterable": true,
+      "ui": {
+        "table": {
+          "filter": {
+            "enabled": true,
+            "placement": "toolbar"
+          }
+        }
+      }
+    }
   ]
 }
 ```
@@ -273,7 +324,101 @@ Contoh read-only resource:
 
 `identifier` bersifat opsional dan dipakai web generator untuk mengganti segment ID di breadcrumb detail/edit. Bisa string tunggal atau array field, misalnya `"identifier": "code"` atau `"identifier": ["code", "name"]`. Field yang dipakai harus ikut di DTO detail.
 
-Untuk web table, `filterable: true` pada `String`, `Text`, dan `MediumText` masuk ke global `searchFields`. Field relasi seperti `ManyToOne` tidak masuk global search; field itu disiapkan untuk jalur more filter/lookup agar user memilih record referensi, bukan mengetik ID.
+### Field metadata
+
+`filterable` adalah capability API/backend. Field dengan `filterable: true` akan disiapkan agar boleh dipakai dalam request filter backend. Jangan pakai `filterable` sebagai satu-satunya instruksi tampilan datatable.
+
+Untuk tampilan web, gunakan block kecil `ui.table`:
+
+```json
+{
+  "name": "status",
+  "type": "Enum",
+  "enumName": "EmployeeStatus",
+  "filterable": true,
+  "defaultColumn": true,
+  "ui": {
+    "table": {
+      "filter": {
+        "enabled": true,
+        "placement": "toolbar",
+        "type": "select",
+        "options": [
+          { "label": "Active", "value": "ACTIVE" },
+          { "label": "Inactive", "value": "INACTIVE" }
+        ]
+      }
+    }
+  }
+}
+```
+
+Supported `ui.table` properties:
+
+| Property | Keterangan |
+|---|---|
+| `searchable` | Field masuk global search datatable. Cocok untuk `String`, `Text`, `MediumText`. |
+| `visibleByDefault` | Override kolom default visible di table. Jika tidak ada, generator fallback ke `defaultColumn`. |
+| `filter.enabled` | Field ditampilkan sebagai filter UI datatable. |
+| `filter.placement` | `"toolbar"` untuk inline kiri dekat search, `"popover"` untuk tombol Filter kanan. |
+| `filter.type` | Optional: `"text"`, `"select"`, `"multi-select"`, `"date"`, atau `"date-range"`. Jika tidak ada, generator infer dari tipe field. |
+| `filter.options` | Optional untuk select/multi-select. Boolean filter otomatis punya opsi all/yes/no. |
+
+Fallback lama tetap didukung:
+
+- Jika tidak ada `ui.table.searchable` sama sekali pada satu resource, `filterable: true` pada `String`, `Text`, dan `MediumText` masih masuk global `searchFields`.
+- Jika tidak ada `ui.table.filter.enabled` sama sekali pada satu resource, non-string `filterable: true` masih memakai jalur advanced/more filter lama.
+- Jika resource sudah mulai memakai `ui.table.filter.enabled`, generator menganggap filter UI resource itu explicit dan hanya field yang diberi `ui.table.filter.enabled: true` yang muncul di datatable filters.
+
+Untuk field relasi `ManyToOne`, generator masih lebih aman memakai jalur manual/lookup khusus. Jangan aktifkan `ui.table.filter.enabled` untuk relasi sebelum lookup filter datatable disambungkan dengan `pageQuery` referensi yang benar.
+
+Contoh pola datatable yang disarankan:
+
+```json
+{
+  "name": "name",
+  "type": "String",
+  "filterable": true,
+  "ui": {
+    "table": {
+      "searchable": true
+    }
+  }
+}
+```
+
+```json
+{
+  "name": "active",
+  "type": "Boolean",
+  "filterable": true,
+  "ui": {
+    "table": {
+      "filter": {
+        "enabled": true,
+        "placement": "toolbar"
+      }
+    }
+  }
+}
+```
+
+```json
+{
+  "name": "createdAt",
+  "type": "Instant",
+  "filterable": true,
+  "ui": {
+    "table": {
+      "filter": {
+        "enabled": true,
+        "placement": "popover",
+        "type": "date-range"
+      }
+    }
+  }
+}
+```
 
 Resource child bisa menambahkan `parent` tanpa mendefinisikan field parent secara manual. CLI otomatis menambahkan relasi `ManyToOne` dengan nama field lower-camel dari parent, misalnya `parent: "Employee"` menjadi field domain `employee` dan DTO field `employeeId`.
 
