@@ -46,6 +46,7 @@ export function {{ENTITY_NAME}}DetailPage() {
                 title={t("common.titles.detailEntity", { entity: singularEntity })}
                 description={t("common.descriptions.detailById", { id: params.id })}
                 breadcrumbLabels={{ [params.id as string]: breadcrumbLabel }}
+                {{DETAIL_BREADCRUMBS}}
                 {{DETAIL_ACTIONS}}
             />
 

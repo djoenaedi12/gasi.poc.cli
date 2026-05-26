@@ -328,13 +328,28 @@ Contoh read-only resource:
 
 `filterable` adalah capability API/backend. Field dengan `filterable: true` akan disiapkan agar boleh dipakai dalam request filter backend. Jangan pakai `filterable` sebagai satu-satunya instruksi tampilan datatable.
 
-Untuk tampilan web, gunakan block kecil `ui.table`:
+Untuk tampilan web, gunakan block kecil `ui.table`. Konfigurasi global search sebaiknya diletakkan di level resource:
+
+```json
+{
+  "entityName": "Employee",
+  "ui": {
+    "table": {
+      "searchFields": ["employeeNo", "fullName"]
+    }
+  },
+  "fields": []
+}
+```
+
+Konfigurasi filter/visibility yang spesifik field tetap diletakkan di field:
 
 ```json
 {
   "name": "status",
   "type": "Enum",
   "enumName": "EmployeeStatus",
+  "enumValues": ["ACTIVE", "INACTIVE"],
   "filterable": true,
   "defaultColumn": true,
   "ui": {
@@ -353,11 +368,16 @@ Untuk tampilan web, gunakan block kecil `ui.table`:
 }
 ```
 
+Untuk target API, setiap `Enum` otomatis dibuatkan class Java di package `domain.model`, misalnya
+`src/main/java/.../domain/model/EmployeeStatus.java`. Nilai enum bisa ditulis lewat
+`enumValues` atau `values`; jika kosong, CLI tetap membuat file enum kosong yang bisa dilengkapi manual.
+
 Supported `ui.table` properties:
 
 | Property | Keterangan |
 |---|---|
-| `searchable` | Field masuk global search datatable. Cocok untuk `String`, `Text`, `MediumText`. |
+| `searchFields` | Daftar field untuk global search datatable di level resource. |
+| `searchable` | Field masuk global search datatable. Cocok untuk override field-specific jika tidak memakai `resource.ui.table.searchFields`. |
 | `visibleByDefault` | Override kolom default visible di table. Jika tidak ada, generator fallback ke `defaultColumn`. |
 | `filter.enabled` | Field ditampilkan sebagai filter UI datatable. |
 | `filter.placement` | `"toolbar"` untuk inline kiri dekat search, `"popover"` untuk tombol Filter kanan. |
@@ -370,15 +390,11 @@ Fallback lama tetap didukung:
 - Jika tidak ada `ui.table.filter.enabled` sama sekali pada satu resource, non-string `filterable: true` masih memakai jalur advanced/more filter lama.
 - Jika resource sudah mulai memakai `ui.table.filter.enabled`, generator menganggap filter UI resource itu explicit dan hanya field yang diberi `ui.table.filter.enabled: true` yang muncul di datatable filters.
 
-Untuk field relasi `ManyToOne`, gunakan `ui.lookup` untuk mengatur teks yang tampil di form, kolom modal lookup, dan field pencarian:
+Untuk resource yang bisa dipilih lewat lookup picker, gunakan `ui.lookup` di level resource. Ini menjadi default cara entity tersebut tampil di semua picker:
 
 ```json
 {
-  "name": "department",
-  "type": "ManyToOne",
-  "refEntity": "Department",
-  "required": true,
-  "filterable": true,
+  "entityName": "Department",
   "ui": {
     "lookup": {
       "labelFields": ["code", "name"],
@@ -388,7 +404,8 @@ Untuk field relasi `ManyToOne`, gunakan `ui.lookup` untuk mengatur teks yang tam
         { "field": "name", "label": "Name" }
       ]
     }
-  }
+  },
+  "fields": []
 }
 ```
 
@@ -400,6 +417,20 @@ Supported `ui.lookup` properties:
 | `searchFields` | Field referensi yang dikirim ke lookup search. |
 | `descriptionFields` | Optional, field referensi yang tampil sebagai deskripsi pada mode lookup satu kolom. |
 | `columns` | Kolom yang tampil di modal lookup. Bisa array string atau object `{ "field": "...", "label": "..." }`. |
+
+Field relasi `ManyToOne` cukup mengarah ke resource target:
+
+```json
+{
+  "name": "department",
+  "type": "ManyToOne",
+  "refEntity": "Department",
+  "required": true,
+  "filterable": true
+}
+```
+
+`ui.lookup` di field relasi masih boleh dipakai sebagai override khusus jika picker tertentu harus berbeda dari default resource.
 
 Contoh pola datatable yang disarankan:
 

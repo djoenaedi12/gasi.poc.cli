@@ -17,7 +17,7 @@ export function {{ENTITY_NAME}}CreatePage() {
         try {
             await create{{ENTITY_NAME}}.mutateAsync(data);
             appToast.success(t("common.messages.createSuccess", { entity: singularEntity }));
-            navigate({{NAVIGATE_LIST}});
+            navigate({{NAVIGATE_AFTER_SAVE}});
         } catch (error) {
             appToast.error(error, t("common.messages.createError", { entity: singularEntity }));
         }
@@ -28,6 +28,7 @@ export function {{ENTITY_NAME}}CreatePage() {
             <PageHeader
                 title={t("common.titles.createEntity", { entity: singularEntity })}
                 description={t("common.descriptions.createEntity", { entity: singularEntity })}
+                {{CREATE_BREADCRUMBS}}
             />
             <CardTabs defaultValue="general" className="w-full max-w-3xl">
                 <CardTabsList>
@@ -38,7 +39,7 @@ export function {{ENTITY_NAME}}CreatePage() {
                     <{{ENTITY_NAME}}Form
                         mode="create"
                         submitLabel={create{{ENTITY_NAME}}.isPending ? t("common.actions.saving") : t("common.actions.save")}
-                        onCancel={() => navigate({{NAVIGATE_LIST}})}
+                        onCancel={() => navigate({{NAVIGATE_AFTER_SAVE}})}
                         onSubmit={handleSubmit}
                     />
                 </CardTabsContent>

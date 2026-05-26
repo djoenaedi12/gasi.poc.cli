@@ -22,7 +22,7 @@ export function {{ENTITY_NAME}}EditPage() {
         try {
             await update{{ENTITY_NAME}}.mutateAsync({ id: params.id as string, data });
             appToast.success(t("common.messages.updateSuccess", { entity: singularEntity }));
-            navigate({{NAVIGATE_LIST}});
+            navigate({{NAVIGATE_AFTER_SAVE}});
         } catch (error) {
             appToast.error(error, t("common.messages.updateError", { entity: singularEntity }));
         }
@@ -52,6 +52,7 @@ export function {{ENTITY_NAME}}EditPage() {
                 title={t("common.titles.editEntity", { entity: singularEntity })}
                 description={t("common.descriptions.updateEntity", { entity: singularEntity })}
                 breadcrumbLabels={{ [params.id as string]: breadcrumbLabel }}
+                {{EDIT_BREADCRUMBS}}
             />
             <CardTabs defaultValue="general" className="w-full max-w-3xl">
                 <CardTabsList>
@@ -63,7 +64,7 @@ export function {{ENTITY_NAME}}EditPage() {
                         mode="edit"
                         defaultValues={{{ENTITY_VAR}}}
                         submitLabel={update{{ENTITY_NAME}}.isPending ? t("common.actions.saving") : t("common.actions.save")}
-                        onCancel={() => navigate({{NAVIGATE_LIST}})}
+                        onCancel={() => navigate({{NAVIGATE_AFTER_SAVE}})}
                         onSubmit={handleSubmit}
                     />
                 </CardTabsContent>

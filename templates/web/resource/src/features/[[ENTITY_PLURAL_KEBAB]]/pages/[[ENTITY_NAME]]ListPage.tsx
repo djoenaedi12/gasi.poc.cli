@@ -37,6 +37,7 @@ export function {{ENTITY_NAME}}ListPage() {
         <ResourceListPage
             title={pluralEntity}
             description={t("common.descriptions.manageEntityMasterData", { entity: pluralEntity })}
+            {{LIST_BREADCRUMBS}}
             {{LIST_HEADER_ACTIONS}}
             columns={columns}
             table={{
