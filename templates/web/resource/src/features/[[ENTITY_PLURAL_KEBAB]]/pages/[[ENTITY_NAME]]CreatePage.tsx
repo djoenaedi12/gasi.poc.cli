@@ -1,6 +1,6 @@
 import { {{CREATE_ROUTER_IMPORTS}} } from "react-router";
 
-import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, useI18n } from "@gasi/core-ui";
+import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, useI18n } from "@gasi/core-ui";
 import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";
 import { useCreate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_NAME}}";
 import type { {{ENTITY_NAME}}CreateFormData } from "../schemas/{{ENTITY_VAR}}CreateSchema";
@@ -14,8 +14,13 @@ export function {{ENTITY_NAME}}CreatePage() {
 
 {{CREATE_MISSING_PARENT_GUARD}}
     const handleSubmit = async (data: {{ENTITY_NAME}}CreateFormData) => {
-        await create{{ENTITY_NAME}}.mutateAsync(data);
-        navigate({{NAVIGATE_LIST}});
+        try {
+            await create{{ENTITY_NAME}}.mutateAsync(data);
+            appToast.success(t("common.messages.createSuccess", { entity: singularEntity }));
+            navigate({{NAVIGATE_LIST}});
+        } catch (error) {
+            appToast.error(error, t("common.messages.createError", { entity: singularEntity }));
+        }
     };
 
     return (

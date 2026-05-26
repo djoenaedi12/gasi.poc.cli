@@ -7,8 +7,10 @@
 {{LIST_TYPE_IMPORTS}}
 {{LIST_BULK_DELETE_IMPORT}}
 {{LIST_FILTER_IMPORTS}}
+{{LIST_LOOKUP_IMPORTS}}
 {{LIST_BUTTON_IMPORT}}
 import { ResourceListPage, useI18n } from "@gasi/core-ui";
+{{LIST_TOAST_IMPORT}}
 import { get{{ENTITY_NAME}}Columns } from "../components/{{ENTITY_NAME}}Columns";
 import { {{LIST_DELETE_IMPORT}} } from "../hooks/use{{ENTITY_NAME}}";
 
@@ -44,7 +46,16 @@ export function {{ENTITY_NAME}}ListPage() {
                 {{MORE_FILTER_PROPS}}
                 searchPlaceholder: t("common.search.byFields", { fields: pluralEntity.toLowerCase() }),
                 loadingTitle: t("common.loading.entity", { entity: pluralEntity }),
-                emptyTitle: t("common.empty.filteredTitle", { entity: pluralEntity }),
+                emptyTitle: t("common.empty.title", { entity: pluralEntity }),
+                emptyDescription: t("common.empty.createOrImportTemplate", { entity: pluralEntity }),
+                emptyState: {
+                    title: t("common.empty.title", { entity: pluralEntity }),
+                    description: t("common.empty.createOrImportTemplate", { entity: pluralEntity }),
+                },
+                filteredEmptyState: {
+                    title: t("common.empty.filteredTitle", { entity: pluralEntity }),
+                    description: t("common.empty.filteredDescription", { entity: pluralEntity }),
+                },
                 enableCsvExport: canDownload,
                 csvFileName: "{{ENTITY_PLURAL_KEBAB}}",
                 enableColumnSettings: true,

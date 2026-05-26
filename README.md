@@ -370,7 +370,36 @@ Fallback lama tetap didukung:
 - Jika tidak ada `ui.table.filter.enabled` sama sekali pada satu resource, non-string `filterable: true` masih memakai jalur advanced/more filter lama.
 - Jika resource sudah mulai memakai `ui.table.filter.enabled`, generator menganggap filter UI resource itu explicit dan hanya field yang diberi `ui.table.filter.enabled: true` yang muncul di datatable filters.
 
-Untuk field relasi `ManyToOne`, generator masih lebih aman memakai jalur manual/lookup khusus. Jangan aktifkan `ui.table.filter.enabled` untuk relasi sebelum lookup filter datatable disambungkan dengan `pageQuery` referensi yang benar.
+Untuk field relasi `ManyToOne`, gunakan `ui.lookup` untuk mengatur teks yang tampil di form, kolom modal lookup, dan field pencarian:
+
+```json
+{
+  "name": "department",
+  "type": "ManyToOne",
+  "refEntity": "Department",
+  "required": true,
+  "filterable": true,
+  "ui": {
+    "lookup": {
+      "labelFields": ["code", "name"],
+      "searchFields": ["code", "name"],
+      "columns": [
+        { "field": "code", "label": "Code" },
+        { "field": "name", "label": "Name" }
+      ]
+    }
+  }
+}
+```
+
+Supported `ui.lookup` properties:
+
+| Property | Keterangan |
+|---|---|
+| `labelFields` | Field referensi yang digabung sebagai label di trigger form setelah dipilih. |
+| `searchFields` | Field referensi yang dikirim ke lookup search. |
+| `descriptionFields` | Optional, field referensi yang tampil sebagai deskripsi pada mode lookup satu kolom. |
+| `columns` | Kolom yang tampil di modal lookup. Bisa array string atau object `{ "field": "...", "label": "..." }`. |
 
 Contoh pola datatable yang disarankan:
 

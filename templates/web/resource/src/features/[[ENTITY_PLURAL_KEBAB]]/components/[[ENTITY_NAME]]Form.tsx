@@ -14,6 +14,7 @@ import {
     create{{ENTITY_NAME}}UpdateSchema,
     type {{ENTITY_NAME}}UpdateFormData,
 } from "../schemas/{{ENTITY_VAR}}UpdateSchema";
+{{FORM_LOOKUP_IMPORTS}}
 
 type {{ENTITY_NAME}}FormProps =
     | {

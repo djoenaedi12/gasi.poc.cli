@@ -382,7 +382,17 @@
           "refEntity": "Department",
           "required": true,
           "filterable": true,
-          "defaultColumn": true
+          "defaultColumn": true,
+          "ui": {
+            "lookup": {
+              "labelFields": ["code", "name"],
+              "searchFields": ["code", "name"],
+              "columns": [
+                { "field": "code", "label": "Code" },
+                { "field": "name", "label": "Name" }
+              ]
+            }
+          }
         },
         {
           "name": "jobTitle",
@@ -390,7 +400,18 @@
           "refEntity": "JobTitle",
           "required": true,
           "filterable": true,
-          "defaultColumn": false
+          "defaultColumn": false,
+          "ui": {
+            "lookup": {
+              "labelFields": ["code", "name"],
+              "searchFields": ["code", "name"],
+              "columns": [
+                { "field": "code", "label": "Code" },
+                { "field": "name", "label": "Name" },
+                { "field": "level", "label": "Level" }
+              ]
+            }
+          }
         }
       ]
     },
@@ -448,7 +469,17 @@
           "refEntity": "Department",
           "required": false,
           "filterable": true,
-          "defaultColumn": false
+          "defaultColumn": false,
+          "ui": {
+            "lookup": {
+              "labelFields": ["code", "name"],
+              "searchFields": ["code", "name"],
+              "columns": [
+                { "field": "code", "label": "Code" },
+                { "field": "name", "label": "Name" }
+              ]
+            }
+          }
         }
       ]
     },
@@ -520,6 +551,25 @@
       "embedInParentDto": false,
       "exposeApi": true,
       "fields": [
+        {
+          "name": "employee",
+          "type": "ManyToOne",
+          "refEntity": "Employee",
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true,
+          "ui": {
+            "lookup": {
+              "labelFields": ["employeeNo", "fullName"],
+              "searchFields": ["employeeNo", "fullName"],
+              "columns": [
+                { "field": "employeeNo", "label": "Employee No" },
+                { "field": "fullName", "label": "Full Name" },
+                { "field": "status", "label": "Status" }
+              ]
+            }
+          }
+        },
         {
           "name": "assetTag",
           "type": "String",

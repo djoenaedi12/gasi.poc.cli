@@ -1,6 +1,6 @@
 import { Navigate, useNavigate, useParams } from "react-router";
 
-import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, useI18n } from "@gasi/core-ui";
+import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, useI18n } from "@gasi/core-ui";
 import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";
 import { use{{ENTITY_NAME}}, useUpdate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_NAME}}";
 import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_VAR}}UpdateSchema";
@@ -19,8 +19,13 @@ export function {{ENTITY_NAME}}EditPage() {
     }
 
     const handleSubmit = async (data: {{ENTITY_NAME}}UpdateFormData) => {
-        await update{{ENTITY_NAME}}.mutateAsync({ id: params.id as string, data });
-        navigate({{NAVIGATE_LIST}});
+        try {
+            await update{{ENTITY_NAME}}.mutateAsync({ id: params.id as string, data });
+            appToast.success(t("common.messages.updateSuccess", { entity: singularEntity }));
+            navigate({{NAVIGATE_LIST}});
+        } catch (error) {
+            appToast.error(error, t("common.messages.updateError", { entity: singularEntity }));
+        }
     };
 
     if ({{ENTITY_VAR}}Query.isLoading) {
