@@ -1,4 +1,4 @@
-import { Navigate, useNavigate, useParams } from "react-router";
+import { {{EDIT_ROUTER_IMPORTS}} } from "react-router";
 
 import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, useI18n } from "@gasi/core-ui";
 import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";

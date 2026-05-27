@@ -44,7 +44,6 @@ export function {{ENTITY_NAME}}ListPage() {
                 {{PAGE_QUERY_PROP}}
                 searchFields: {{SEARCH_FIELDS}},
                 {{DATATABLE_FILTERS}}
-                {{MORE_FILTER_PROPS}}
                 searchPlaceholder: t("common.search.byFields", { fields: pluralEntity.toLowerCase() }),
                 loadingTitle: t("common.loading.entity", { entity: pluralEntity }),
                 emptyTitle: t("common.empty.title", { entity: pluralEntity }),

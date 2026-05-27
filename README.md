@@ -42,6 +42,23 @@ gasi plugin create --target api --name hr
 gasi plugin create --target all --name hr -y
 ```
 
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `-n, --name <name>` | Nama plugin (contoh: `hr`) |
+| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `all`) |
+| `--plugin-prefix <prefix>` | Prefix tabel plugin (API only) |
+| `-d, --domain <domain>` | Nama package domain Java (API only) |
+| `-p, --package <package>` | Base package (API only, default: `gasi.gps`) |
+| `-v, --plugin-version <version>` | Versi plugin (default: `1.0.0`) |
+| `--description <desc>` | Deskripsi plugin |
+| `--depends-on <dep>` | Dependensi plugin lain (API only, bisa diulang) |
+| `--no-flyway` | Skip sample Flyway migration (API only) |
+| `--no-register` | Skip auto-register di parent `pom.xml` (API only) |
+| `-y, --yes` | Skip prompt interaktif, gunakan default |
+| `--cwd <path>` | Root project directory (default: cwd) |
+
 **Output web plugin** (`plugins/hr-plugin/`):
 ```
 plugins/hr-plugin/
@@ -73,6 +90,17 @@ gasi plugin build hr --target all
 gasi plugin build hr --target all --dry-run
 ```
 
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
+| `--skip-tests` | Skip tests saat Maven build (API only) |
+| `--profile <name>` | Maven profile yang diaktifkan (API only) |
+| `--verbose` | Tampilkan full Maven output (API only) |
+| `--dry-run` | Print command tanpa menjalankan |
+| `--cwd <path>` | Root project directory (default: cwd) |
+
 Web build output ke `plugins/hr-plugin/dist/plugin-hr.umd.cjs`.
 
 ---
@@ -94,6 +122,17 @@ gasi plugin deploy hr --target all
 # Dry run
 gasi plugin deploy hr --target all --dry-run
 ```
+
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
+| `--plugins-dir <path>` | Override direktori deployment plugin |
+| `--keep-old` | Simpan JAR lama yang sudah dideploy (API only) |
+| `--keep-deployed` | Skip hapus file deployed saat delete |
+| `--dry-run` | Print aksi deploy tanpa mengubah file |
+| `--cwd <path>` | Root project directory (default: cwd) |
 
 > Web deploy copy file dari `plugins/hr-plugin/dist/` ke `platform-app/public/plugins/`
 > dan menambahkan URL bundle ke `platform-app/public/plugins/manifest.json`.
@@ -119,6 +158,15 @@ gasi plugin clean hr --target all
 gasi plugin clean hr --target all --dry-run
 ```
 
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
+| `--plugins-dir <path>` | Override direktori deployment plugin |
+| `--dry-run` | Print aksi clean tanpa mengubah file |
+| `--cwd <path>` | Root project directory (default: cwd) |
+
 ---
 
 ### `gasi plugin delete <name>`
@@ -141,6 +189,17 @@ gasi plugin delete hr --target all -y
 # Dry run
 gasi plugin delete hr --target all --dry-run
 ```
+
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
+| `--plugins-dir <path>` | Override direktori deployment plugin |
+| `--keep-deployed` | Simpan file deployed saat hapus folder plugin |
+| `--dry-run` | Print rencana hapus tanpa mengeksekusi |
+| `-y, --yes` | Skip konfirmasi |
+| `--cwd <path>` | Root project directory (default: cwd) |
 
 Delete plan yang ditampilkan sebelum eksekusi:
 ```
@@ -167,6 +226,12 @@ List plugin yang terdaftar di parent `pom.xml`.
 gasi plugin list
 ```
 
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `--cwd <path>` | Root project directory (default: cwd) |
+
 ---
 
 ### `gasi resource create`
@@ -174,15 +239,32 @@ gasi plugin list
 Generate full CRUD resource di dalam plugin yang sudah ada.
 
 ```bash
-# API resource
+# API resource (interactive)
 gasi resource create Employee --cwd plugins/hr-plugin
 
 # Web resource di dalam plugin
 gasi resource create Employee --target web --web-dir plugins/hr-plugin
 
-# Dari file definisi
-gasi resource create --target web --web-dir plugins/hr-plugin -f resource.json
+# API + Web sekaligus dari file definisi
+gasi resource create --target all --web-dir plugins/hr-plugin -f resource.json
+
+# Multiple file sekaligus
+gasi resource create --target api -f employee.json -f department.json
+
+# Overwrite file web yang sudah ada
+gasi resource create --target web --web-dir plugins/hr-plugin -f resource.json --web-force
 ```
+
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `--target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
+| `--web-dir <path>` | Root frontend plugin untuk `--target web/all` |
+| `--web-force` | Overwrite file web yang sudah digenerate |
+| `-f, --file <file>` | File definisi resource (JSON). Bisa diulang untuk multi-file. |
+| `-y, --yes` | Skip konfirmasi |
+| `--cwd <path>` | Root project directory (default: cwd) |
 
 **Output web resource** mengikuti naming convention `gasi.poc.web`:
 
@@ -193,6 +275,14 @@ src/features/employees/
 │   └── EmployeeForm.tsx
 ├── hooks/
 │   └── useEmployee.ts
+├── i18n/
+│   ├── index.ts
+│   └── locales/
+│       ├── en.ts
+│       └── id.ts
+├── lookups/
+│   ├── employeeLookup.ts
+│   └── index.ts
 ├── pages/
 │   ├── EmployeeCreatePage.tsx
 │   ├── EmployeeDetailPage.tsx
@@ -212,11 +302,27 @@ src/features/employees/
 
 ### `gasi resource delete <entityName>`
 
-Hapus semua file resource yang sudah di-generate.
+Hapus semua file resource API yang sudah di-generate.
 
 ```bash
 gasi resource delete Employee
+
+# Termasuk hapus migration SQL
+gasi resource delete Employee --include-migration
+
+# Skip konfirmasi
+gasi resource delete Employee -y
 ```
+
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `--include-migration` | Hapus juga file Flyway migration SQL |
+| `-y, --yes` | Skip konfirmasi |
+| `--cwd <path>` | Root project directory (default: cwd) |
+
+> Migration SQL tidak dihapus secara default. Gunakan `--include-migration` untuk menghapusnya.
 
 ---
 
@@ -225,8 +331,21 @@ gasi resource delete Employee
 Generate `DataUplProcessor` untuk upload data.
 
 ```bash
-gasi uploader create Employee --plugin hr
+# Interactive (pilih plugin dari daftar)
+gasi uploader create Employee
+
+# Tentukan plugin dan resource name secara eksplisit
+gasi uploader create Employee --plugin hr --resource employees
 ```
+
+**Opsi:**
+
+| Flag | Keterangan |
+|---|---|
+| `--plugin <name>` | Nama plugin target (contoh: `hr` atau `plugins/hr-plugin`) |
+| `--resource <name>` | Nama resource upload API (contoh: `employees`) |
+| `-y, --yes` | Skip konfirmasi |
+| `--cwd <path>` | Root project directory (default: cwd) |
 
 ---
 
@@ -239,67 +358,148 @@ gasi uploader create Employee --plugin hr
   "identifier": ["employeeNo", "fullName"],
   "basePath": "/hr/employees",
   "fields": [
-    {
-      "name": "employeeNo",
-      "type": "String",
-      "required": true,
-      "dto": { "summary": true, "detail": true, "create": true, "update": true },
-      "filterable": true,
-      "ui": {
-        "table": {
-          "searchable": true
-        }
-      }
-    },
-    {
-      "name": "fullName",
-      "type": "String",
-      "required": true,
-      "dto": { "summary": true, "detail": true, "create": true, "update": true },
-      "filterable": true,
-      "ui": {
-        "table": {
-          "searchable": true
-        }
-      }
-    },
-    { "name": "email",      "type": "String",  "required": false, "dto": { "summary": false,"detail": true, "create": true, "update": true }, "validation": { "email": true } },
-    {
-      "name": "joinDate",
-      "type": "Date",
-      "required": false,
-      "dto": { "summary": true, "detail": true, "create": true, "update": true },
-      "filterable": true,
-      "ui": {
-        "table": {
-          "filter": {
-            "enabled": true,
-            "placement": "popover",
-            "type": "date-range"
-          }
-        }
-      }
-    },
-    {
-      "name": "isActive",
-      "type": "Boolean",
-      "required": true,
-      "dto": { "summary": true, "detail": true, "create": true, "update": true },
-      "filterable": true,
-      "ui": {
-        "table": {
-          "filter": {
-            "enabled": true,
-            "placement": "toolbar"
-          }
-        }
-      }
-    }
+    { "name": "employeeNo", "type": "String",  "required": true,  "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } },
+    { "name": "fullName",   "type": "String",  "required": true,  "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } },
+    { "name": "email",      "type": "String",  "required": false, "dto": { "summary": false, "detail": true, "create": true, "update": true }, "validation": { "email": true } },
+    { "name": "joinDate",   "type": "Date",    "required": false, "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } },
+    { "name": "isActive",   "type": "Boolean", "required": true,  "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } }
   ]
 }
 ```
 
-**Tipe field:** `String`, `Integer`, `Long`, `BigDecimal`, `Double`, `Boolean`, `Date`, `DateTime`, `Instant`, `ManyToOne`, `Enum`
+### Multi-resource file
+
+File definisi bisa berisi lebih dari satu resource. Format yang didukung:
+
+**Array langsung:**
+```json
+[
+  { "entityName": "Employee", "fields": [...] },
+  { "entityName": "Department", "fields": [...] }
+]
+```
+
+**Object dengan key `resources`:**
+```json
+{
+  "resources": [
+    { "entityName": "Employee", "fields": [...] },
+    { "entityName": "Department", "fields": [...] }
+  ]
+}
+```
+
+Semua `entityName` di dalam satu file (atau lintas beberapa `-f`) harus unik.
+
+---
+
+### Tipe Field
+
+| Tipe | Java | Keterangan |
+|---|---|---|
+| `String` | `String` | Teks pendek, default length 255 |
+| `Text` | `String` | Teks panjang (`@Lob`) |
+| `MediumText` | `String` | Teks sedang (`@Column(columnDefinition = "MEDIUMTEXT")`) |
+| `Integer` | `Integer` | Bilangan bulat 32-bit |
+| `Long` | `Long` | Bilangan bulat 64-bit |
+| `BigDecimal` | `BigDecimal` | Desimal presisi tinggi |
+| `Double` | `Double` | Desimal double |
+| `Boolean` | `Boolean` | True/false |
+| `Date` | `LocalDate` | Tanggal |
+| `DateTime` | `LocalDateTime` | Tanggal dan waktu |
+| `Instant` | `Instant` | Timestamp UTC |
+| `Enum` | `<EnumName>` | Enum Java, butuh `enumName` |
+| `ManyToOne` | `<Entity>` | Relasi FK, butuh `refEntity` |
+
+---
+
+### Field Properties
+
+| Property | Tipe | Default | Keterangan |
+|---|---|---|---|
+| `name` | string | — | Nama field, camelCase |
+| `type` | string | — | Tipe field (lihat tabel di atas) |
+| `required` | boolean | `true` | Field wajib diisi |
+| `unique` | boolean | `false` | Field harus unik. Hanya untuk `String`, `Integer`, `Long`. |
+| `filterable` | boolean | `false` | Field bisa dipakai sebagai filter di API backend |
+| `length` | number | `255` | Panjang maksimum kolom. Hanya untuk `String`. |
+| `enumName` | string | — | Nama class Enum Java. Wajib untuk `Enum`. |
+| `enumValues` | string[] | — | Nilai-nilai enum (UPPER_SNAKE_CASE). Bisa juga pakai `values`. |
+| `refEntity` | string | — | Nama entity referensi, PascalCase. Wajib untuk `ManyToOne`. |
+| `dto` | object | semua `true` | Kontrol inklusi field di masing-masing DTO (`create`, `update`, `summary`, `detail`). |
+| `defaultColumn` | boolean | `true` | Apakah kolom tampil secara default di datatable. |
+| `description` | string | — | Teks deskripsi field yang ditampilkan di form. |
+| `tooltip` | string | — | Teks tooltip yang muncul saat hover di form. |
+| `filterable` | boolean | `false` | Kapabilitas filter API/backend. |
+| `validation` | object | `{}` | Validasi field (lihat tabel validasi). |
+
+---
+
+### Field Validation
+
+Blok `validation` mendukung constraint per tipe field.
+
+**String, Text, MediumText:**
+
+| Key | Tipe | Keterangan |
+|---|---|---|
+| `email` | boolean | Validasi format email |
+| `minLength` | number | Panjang minimum string |
+| `maxLength` | number | Panjang maksimum string (tidak boleh melebihi `length`) |
+| `pattern` | string | Regex Java yang harus cocok |
+| `patternMessage` | string | Pesan error custom untuk `pattern` |
+
+**Integer, Long:**
+
+| Key | Tipe | Keterangan |
+|---|---|---|
+| `min` | number | Nilai minimum |
+| `max` | number | Nilai maksimum |
+| `positive` | boolean | Harus > 0 |
+| `positiveOrZero` | boolean | Harus >= 0 |
+| `negative` | boolean | Harus < 0 |
+| `negativeOrZero` | boolean | Harus <= 0 |
+
+**BigDecimal, Double:**
+
+| Key | Tipe | Keterangan |
+|---|---|---|
+| `decimalMin` | string | Nilai minimum (string desimal, misal `"0.01"`) |
+| `decimalMax` | string | Nilai maksimum |
+| `digits` | object | `{ "integer": N, "fraction": N }` — batas digit integer dan pecahan |
+| `positive` | boolean | Harus > 0 |
+| `positiveOrZero` | boolean | Harus >= 0 |
+| `negative` | boolean | Harus < 0 |
+| `negativeOrZero` | boolean | Harus <= 0 |
+
+**Date, DateTime, Instant:**
+
+| Key | Tipe | Keterangan |
+|---|---|---|
+| `past` | boolean | Harus di masa lalu |
+| `pastOrPresent` | boolean | Harus di masa lalu atau sekarang |
+| `future` | boolean | Harus di masa depan |
+| `futureOrPresent` | boolean | Harus di masa depan atau sekarang |
+
+> Hanya satu dari empat di atas yang boleh aktif sekaligus.
+
+**Boolean:**
+
+| Key | Tipe | Keterangan |
+|---|---|---|
+| `assertTrue` | boolean | Harus bernilai `true` |
+| `assertFalse` | boolean | Harus bernilai `false` |
+
+Contoh validasi:
+
+```json
+{ "name": "email", "type": "String", "validation": { "email": true, "maxLength": 100 } }
+{ "name": "salary", "type": "BigDecimal", "validation": { "decimalMin": "0.00", "digits": { "integer": 10, "fraction": 2 } } }
+{ "name": "age", "type": "Integer", "validation": { "min": 18, "max": 65 } }
+{ "name": "birthDate", "type": "Date", "validation": { "past": true } }
+```
+
+---
 
 `mode` bersifat opsional dan default-nya `crud`.
 
@@ -328,43 +528,25 @@ Contoh read-only resource:
 
 `filterable` adalah capability API/backend. Field dengan `filterable: true` akan disiapkan agar boleh dipakai dalam request filter backend. Jangan pakai `filterable` sebagai satu-satunya instruksi tampilan datatable.
 
-Untuk tampilan web, gunakan block kecil `ui.table`. Konfigurasi global search sebaiknya diletakkan di level resource:
+Contoh konfigurasi `ui` di level resource:
 
 ```json
 {
   "entityName": "Employee",
   "ui": {
     "table": {
-      "searchFields": ["employeeNo", "fullName"]
+      "searchFields": ["employeeNo", "fullName"],
+      "filters": [
+        { "field": "joinDate", "type": "date-range", "placement": "inline" },
+        { "field": "isActive", "type": "boolean", "placement": "toolbar" }
+      ]
     }
   },
-  "fields": []
-}
-```
-
-Konfigurasi filter/visibility yang spesifik field tetap diletakkan di field:
-
-```json
-{
-  "name": "status",
-  "type": "Enum",
-  "enumName": "EmployeeStatus",
-  "enumValues": ["ACTIVE", "INACTIVE"],
-  "filterable": true,
-  "defaultColumn": true,
-  "ui": {
-    "table": {
-      "filter": {
-        "enabled": true,
-        "placement": "toolbar",
-        "type": "select",
-        "options": [
-          { "label": "Active", "value": "ACTIVE" },
-          { "label": "Inactive", "value": "INACTIVE" }
-        ]
-      }
-    }
-  }
+  "fields": [
+    { "name": "employeeNo", "type": "String",  "filterable": true },
+    { "name": "joinDate",   "type": "Date",    "filterable": true },
+    { "name": "isActive",   "type": "Boolean", "filterable": true }
+  ]
 }
 ```
 
@@ -376,19 +558,51 @@ Supported `ui.table` properties:
 
 | Property | Keterangan |
 |---|---|
-| `searchFields` | Daftar field untuk global search datatable di level resource. |
-| `searchable` | Field masuk global search datatable. Cocok untuk override field-specific jika tidak memakai `resource.ui.table.searchFields`. |
-| `visibleByDefault` | Override kolom default visible di table. Jika tidak ada, generator fallback ke `defaultColumn`. |
-| `filter.enabled` | Field ditampilkan sebagai filter UI datatable. |
-| `filter.placement` | `"toolbar"` untuk inline kiri dekat search, `"popover"` untuk tombol Filter kanan. |
-| `filter.type` | Optional: `"text"`, `"select"`, `"multi-select"`, `"date"`, atau `"date-range"`. Jika tidak ada, generator infer dari tipe field. |
-| `filter.options` | Optional untuk select/multi-select. Boolean filter otomatis punya opsi all/yes/no. |
+| `searchFields` | Daftar field untuk global search datatable. |
+| `defaultColumns` | Daftar field yang tampil sebagai kolom default di datatable. |
+| `filters` | Daftar filter datatable. Bisa string field atau object `{ "field": "...", "placement": "inline" }`. Placement valid: `"inline"` atau `"toolbar"`, default `"toolbar"`. |
 
-Fallback lama tetap didukung:
+Setiap item di dalam `filters` bisa berupa string field name atau object dengan opsi berikut:
 
-- Jika tidak ada `ui.table.searchable` sama sekali pada satu resource, `filterable: true` pada `String`, `Text`, dan `MediumText` masih masuk global `searchFields`.
-- Jika tidak ada `ui.table.filter.enabled` sama sekali pada satu resource, non-string `filterable: true` masih memakai jalur advanced/more filter lama.
-- Jika resource sudah mulai memakai `ui.table.filter.enabled`, generator menganggap filter UI resource itu explicit dan hanya field yang diberi `ui.table.filter.enabled: true` yang muncul di datatable filters.
+| Key | Keterangan |
+|---|---|
+| `field` | Nama field yang difilter |
+| `placement` | `"inline"` atau `"toolbar"` (default `"toolbar"`) |
+| `type` | `"text"`, `"select"`, `"multi-select"`, `"date"`, `"date-range"`, `"lookup"`, `"boolean"`, atau `"toggle"`. Jika tidak diisi, generator infer dari tipe field (`ManyToOne` → `"lookup"`, `Boolean` → `"boolean"`). |
+| `options` | Optional untuk `select`/`multi-select`. Boolean filter otomatis punya opsi all/yes/no. |
+
+Contoh filter lookup untuk relasi `ManyToOne` (`Employee.department`):
+
+```json
+{
+  "entityName": "Employee",
+  "ui": {
+    "table": {
+      "filters": [
+        { "field": "department", "type": "lookup", "placement": "inline" }
+      ]
+    }
+  },
+  "fields": [...]
+}
+```
+
+Generator membuat filter ke field `departmentId`, tetapi UI-nya memakai `LookupPicker` dengan preset `departmentLookup`.
+
+Contoh filter boolean dan toggle:
+
+```json
+{
+  "ui": {
+    "table": {
+      "filters": [
+        { "field": "active",         "type": "boolean", "placement": "toolbar" },
+        { "field": "primaryAddress", "type": "toggle",  "placement": "inline" }
+      ]
+    }
+  }
+}
+```
 
 Untuk resource yang bisa dipilih lewat lookup picker, gunakan `ui.lookup` di level resource. Ini menjadi default cara entity tersebut tampil di semua picker:
 
@@ -427,56 +641,6 @@ Field relasi `ManyToOne` cukup mengarah ke resource target:
   "refEntity": "Department",
   "required": true,
   "filterable": true
-}
-```
-
-`ui.lookup` di field relasi masih boleh dipakai sebagai override khusus jika picker tertentu harus berbeda dari default resource.
-
-Contoh pola datatable yang disarankan:
-
-```json
-{
-  "name": "name",
-  "type": "String",
-  "filterable": true,
-  "ui": {
-    "table": {
-      "searchable": true
-    }
-  }
-}
-```
-
-```json
-{
-  "name": "active",
-  "type": "Boolean",
-  "filterable": true,
-  "ui": {
-    "table": {
-      "filter": {
-        "enabled": true,
-        "placement": "toolbar"
-      }
-    }
-  }
-}
-```
-
-```json
-{
-  "name": "createdAt",
-  "type": "Instant",
-  "filterable": true,
-  "ui": {
-    "table": {
-      "filter": {
-        "enabled": true,
-        "placement": "popover",
-        "type": "date-range"
-      }
-    }
-  }
 }
 ```
 

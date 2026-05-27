@@ -3,17 +3,47 @@
     {
       "entityName": "Department",
       "mode": "crud",
-      "identifier": ["code", "name"],
+      "identifier": [
+        "code",
+        "name"
+      ],
       "ui": {
         "table": {
-          "searchFields": ["code", "name"]
+          "searchFields": [
+            "code",
+            "name"
+          ],
+          "filters": [
+            {
+              "field": "code",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "name",
+              "type": "text",
+              "placement": "toolbar"
+            }
+          ]
         },
         "lookup": {
-          "labelFields": ["code", "name"],
-          "searchFields": ["code", "name"],
+          "labelFields": [
+            "code",
+            "name"
+          ],
+          "searchFields": [
+            "code",
+            "name"
+          ],
           "columns": [
-            { "field": "code", "label": "Code" },
-            { "field": "name", "label": "Name" }
+            {
+              "field": "code",
+              "label": "Code"
+            },
+            {
+              "field": "name",
+              "label": "Name"
+            }
           ]
         }
       },
@@ -25,13 +55,13 @@
           "required": true,
           "unique": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 2,
             "maxLength": 50,
             "pattern": "^[A-Z0-9-]+$",
             "patternMessage": "Code must contain uppercase letters, numbers, or dash only"
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "name",
@@ -39,11 +69,11 @@
           "length": 150,
           "required": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "description",
@@ -67,15 +97,50 @@
       "mode": "read",
       "ui": {
         "table": {
-          "searchFields": ["code", "name"]
+          "searchFields": [
+            "code",
+            "name"
+          ],
+          "filters": [
+            {
+              "field": "code",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "name",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "level",
+              "type": "text",
+              "placement": "toolbar"
+            }
+          ]
         },
         "lookup": {
-          "labelFields": ["code", "name"],
-          "searchFields": ["code", "name"],
+          "labelFields": [
+            "code",
+            "name"
+          ],
+          "searchFields": [
+            "code",
+            "name"
+          ],
           "columns": [
-            { "field": "code", "label": "Code" },
-            { "field": "name", "label": "Name" },
-            { "field": "level", "label": "Level" }
+            {
+              "field": "code",
+              "label": "Code"
+            },
+            {
+              "field": "name",
+              "label": "Name"
+            },
+            {
+              "field": "level",
+              "label": "Level"
+            }
           ]
         }
       },
@@ -87,13 +152,13 @@
           "required": true,
           "unique": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 2,
             "maxLength": 50,
             "pattern": "^[A-Z0-9-]+$",
             "patternMessage": "Code must contain uppercase letters, numbers, or dash only"
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "name",
@@ -101,30 +166,22 @@
           "length": 150,
           "required": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "level",
           "type": "Integer",
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover"
-              }
-            }
-          },
           "validation": {
             "min": 1,
             "max": 20
-          }
+          },
+          "defaultColumn": false
         }
       ]
     },
@@ -133,15 +190,110 @@
       "mode": "crud",
       "ui": {
         "table": {
-          "searchFields": ["employeeNo", "fullName"]
+          "searchFields": [
+            "employeeNo",
+            "fullName"
+          ],
+          "filters": [
+            {
+              "field": "employeeNo",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "fullName",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "email",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "phoneNumber",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "age",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "nationalId",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "salary",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "performanceScore",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "active",
+              "type": "select",
+              "placement": "toolbar"
+            },
+            {
+              "field": "birthDate",
+              "type": "date-range",
+              "placement": "toolbar"
+            },
+            {
+              "field": "joinedAt",
+              "type": "date-range",
+              "placement": "toolbar"
+            },
+            {
+              "field": "lastLoginAt",
+              "type": "date-range",
+              "placement": "toolbar"
+            },
+            {
+              "field": "status",
+              "type": "select",
+              "placement": "toolbar"
+            },
+            {
+              "field": "department",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "jobTitle",
+              "type": "text",
+              "placement": "toolbar"
+            }
+          ]
         },
         "lookup": {
-          "labelFields": ["employeeNo", "fullName"],
-          "searchFields": ["employeeNo", "fullName"],
+          "labelFields": [
+            "employeeNo",
+            "fullName"
+          ],
+          "searchFields": [
+            "employeeNo",
+            "fullName"
+          ],
           "columns": [
-            { "field": "employeeNo", "label": "Employee No" },
-            { "field": "fullName", "label": "Full Name" },
-            { "field": "status", "label": "Status" }
+            {
+              "field": "employeeNo",
+              "label": "Employee No"
+            },
+            {
+              "field": "fullName",
+              "label": "Full Name"
+            },
+            {
+              "field": "status",
+              "label": "Status"
+            }
           ]
         }
       },
@@ -153,13 +305,13 @@
           "required": true,
           "unique": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 50,
             "pattern": "^[A-Z0-9-]+$",
             "patternMessage": "Employee number must contain uppercase letters, numbers, or dash only"
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "fullName",
@@ -167,11 +319,11 @@
           "length": 150,
           "required": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "email",
@@ -180,11 +332,11 @@
           "required": true,
           "unique": true,
           "filterable": true,
-          "defaultColumn": false,
           "validation": {
             "email": true,
             "maxLength": 150
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "phoneNumber",
@@ -192,22 +344,22 @@
           "length": 30,
           "required": false,
           "filterable": true,
-          "defaultColumn": false,
           "validation": {
             "maxLength": 30,
             "pattern": "^[0-9+ -]+$",
             "patternMessage": "Phone number must contain numbers, plus, space, or dash only"
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "bio",
           "type": "Text",
           "required": false,
           "filterable": false,
-          "defaultColumn": false,
           "validation": {
             "maxLength": 2000
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "notes",
@@ -226,19 +378,11 @@
           "type": "Integer",
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover"
-              }
-            }
-          },
           "validation": {
             "min": 18,
             "max": 65
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "nationalId",
@@ -246,33 +390,16 @@
           "required": false,
           "unique": true,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover"
-              }
-            }
-          },
           "validation": {
             "positive": true
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "salary",
           "type": "BigDecimal",
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover"
-              }
-            }
-          },
           "validation": {
             "decimalMin": "0.00",
             "decimalMax": "999999999.99",
@@ -280,95 +407,52 @@
               "integer": 12,
               "fraction": 2
             }
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "performanceScore",
           "type": "Double",
           "required": false,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover"
-              }
-            }
-          },
           "validation": {
             "decimalMin": "0.00",
             "decimalMax": "100.00"
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "active",
           "type": "Boolean",
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "toolbar"
-              }
-            }
-          }
+          "defaultColumn": false
         },
         {
           "name": "birthDate",
           "type": "Date",
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover",
-                "type": "date-range"
-              }
-            }
-          },
           "validation": {
             "past": true
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "joinedAt",
           "type": "DateTime",
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover",
-                "type": "date-range"
-              }
-            }
-          },
           "validation": {
             "pastOrPresent": true
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "lastLoginAt",
           "type": "Instant",
           "required": false,
           "filterable": true,
-          "defaultColumn": false,
-          "ui": {
-            "table": {
-              "filter": {
-                "enabled": true,
-                "placement": "popover",
-                "type": "date-range"
-              }
-            }
-          },
           "dto": {
             "create": false,
             "update": false,
@@ -377,13 +461,19 @@
           },
           "validation": {
             "pastOrPresent": true
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "status",
           "type": "Enum",
           "enumName": "EmployeeStatus",
-          "enumValues": ["ACTIVE", "INACTIVE", "SUSPENDED", "TERMINATED"],
+          "enumValues": [
+            "ACTIVE",
+            "INACTIVE",
+            "SUSPENDED",
+            "TERMINATED"
+          ],
           "required": true,
           "filterable": true,
           "defaultColumn": true
@@ -420,17 +510,23 @@
           "length": 150,
           "required": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 3,
             "maxLength": 150
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "relationship",
           "type": "Enum",
           "enumName": "EmergencyContactRelationship",
-          "enumValues": ["SPOUSE", "CHILD", "PARENT", "FRIEND", "OTHER"],
+          "enumValues": [
+            "SPOUSE",
+            "CHILD",
+            "PARENT",
+            "FRIEND",
+            "OTHER"
+          ],
           "required": true,
           "filterable": true,
           "defaultColumn": true
@@ -441,12 +537,12 @@
           "length": 30,
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
           "validation": {
             "maxLength": 30,
             "pattern": "^[0-9+ -]+$",
             "patternMessage": "Phone number must contain numbers, plus, space, or dash only"
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "primaryContact",
@@ -463,7 +559,38 @@
           "filterable": true,
           "defaultColumn": false
         }
-      ]
+      ],
+      "ui": {
+        "table": {
+          "filters": [
+            {
+              "field": "name",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "relationship",
+              "type": "select",
+              "placement": "toolbar"
+            },
+            {
+              "field": "phoneNumber",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "primaryContact",
+              "type": "select",
+              "placement": "toolbar"
+            },
+            {
+              "field": "contactDepartment",
+              "type": "text",
+              "placement": "toolbar"
+            }
+          ]
+        }
+      }
     },
     {
       "entityName": "EmployeeAddress",
@@ -477,7 +604,11 @@
           "name": "addressType",
           "type": "Enum",
           "enumName": "EmployeeAddressType",
-          "enumValues": ["HOME", "WORK", "OTHER"],
+          "enumValues": [
+            "HOME",
+            "WORK",
+            "OTHER"
+          ],
           "required": true,
           "filterable": true,
           "defaultColumn": true
@@ -488,11 +619,11 @@
           "length": 255,
           "required": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 5,
             "maxLength": 255
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "city",
@@ -500,11 +631,11 @@
           "length": 100,
           "required": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 2,
             "maxLength": 100
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "postalCode",
@@ -512,10 +643,10 @@
           "length": 20,
           "required": false,
           "filterable": true,
-          "defaultColumn": false,
           "validation": {
             "maxLength": 20
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "primaryAddress",
@@ -524,7 +655,38 @@
           "filterable": true,
           "defaultColumn": false
         }
-      ]
+      ],
+      "ui": {
+        "table": {
+          "filters": [
+            {
+              "field": "addressType",
+              "type": "select",
+              "placement": "toolbar"
+            },
+            {
+              "field": "addressLine",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "city",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "postalCode",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "primaryAddress",
+              "type": "select",
+              "placement": "toolbar"
+            }
+          ]
+        }
+      }
     },
     {
       "entityName": "EmployeeAsset",
@@ -533,6 +695,46 @@
       "apiStyle": "root",
       "embedInParentDto": false,
       "exposeApi": true,
+      "ui": {
+        "table": {
+          "searchFields": [
+            "assetTag",
+            "assetName"
+          ],
+          "filters": [
+            {
+              "field": "employee",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "assetTag",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "assetName",
+              "type": "text",
+              "placement": "toolbar"
+            },
+            {
+              "field": "issuedAt",
+              "type": "date-range",
+              "placement": "toolbar"
+            },
+            {
+              "field": "returnedAt",
+              "type": "date-range",
+              "placement": "toolbar"
+            },
+            {
+              "field": "assetStatus",
+              "type": "select",
+              "placement": "toolbar"
+            }
+          ]
+        }
+      },
       "fields": [
         {
           "name": "employee",
@@ -549,11 +751,11 @@
           "required": true,
           "unique": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 2,
             "maxLength": 80
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "assetName",
@@ -561,37 +763,42 @@
           "length": 150,
           "required": true,
           "filterable": true,
-          "defaultColumn": true,
           "validation": {
             "minLength": 2,
             "maxLength": 150
-          }
+          },
+          "defaultColumn": true
         },
         {
           "name": "issuedAt",
           "type": "Date",
           "required": true,
           "filterable": true,
-          "defaultColumn": false,
           "validation": {
             "pastOrPresent": true
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "returnedAt",
           "type": "Date",
           "required": false,
           "filterable": true,
-          "defaultColumn": false,
           "validation": {
             "pastOrPresent": true
-          }
+          },
+          "defaultColumn": false
         },
         {
           "name": "assetStatus",
           "type": "Enum",
           "enumName": "EmployeeAssetStatus",
-          "enumValues": ["ISSUED", "RETURNED", "LOST", "DAMAGED"],
+          "enumValues": [
+            "ISSUED",
+            "RETURNED",
+            "LOST",
+            "DAMAGED"
+          ],
           "required": true,
           "filterable": true,
           "defaultColumn": true

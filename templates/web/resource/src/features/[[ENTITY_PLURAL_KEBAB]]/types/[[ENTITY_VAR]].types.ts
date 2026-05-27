@@ -1,5 +1,7 @@
 export type { ApiResponse, SearchRequest, PageResult } from "@gasi/core-ui";
 
+{{TYPES_ENUMS}}
+
 export type {{ENTITY_NAME}}Summary = {
     id: string;
 {{TYPES_SUMMARY_FIELDS}}
