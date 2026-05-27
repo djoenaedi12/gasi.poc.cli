@@ -1,7 +1,8 @@
 import { {{CREATE_ROUTER_IMPORTS}} } from "react-router";
+import type { UseFormReturn } from "react-hook-form";
 
-import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, useI18n } from "@gasi/core-ui";
-import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";
+import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, applyApiFieldErrors, useI18n } from "@gasi/core-ui";
+import { {{ENTITY_NAME}}Form, type {{ENTITY_NAME}}FormData } from "../components/{{ENTITY_NAME}}Form";
 import { useCreate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_NAME}}";
 import type { {{ENTITY_NAME}}CreateFormData } from "../schemas/{{ENTITY_VAR}}CreateSchema";
 
@@ -13,12 +14,15 @@ export function {{ENTITY_NAME}}CreatePage() {
     const singularEntity = t("{{I18N_KEY_PREFIX}}.names.singular");
 
 {{CREATE_MISSING_PARENT_GUARD}}
-    const handleSubmit = async (data: {{ENTITY_NAME}}CreateFormData) => {
+    const handleSubmit = async (data: {{ENTITY_NAME}}CreateFormData, form: UseFormReturn<{{ENTITY_NAME}}FormData>) => {
         try {
             await create{{ENTITY_NAME}}.mutateAsync(data);
             appToast.success(t("common.messages.createSuccess", { entity: singularEntity }));
             navigate({{NAVIGATE_AFTER_SAVE}});
         } catch (error) {
+            if (applyApiFieldErrors(form, error)) {
+                return;
+            }
             appToast.error(error, t("common.messages.createError", { entity: singularEntity }));
         }
     };

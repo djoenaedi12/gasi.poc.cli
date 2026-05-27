@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save } from "lucide-react";
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormReturn } from "react-hook-form";
 
 {{FORM_IMPORTS}}
 import { Button, useI18n } from "@gasi/core-ui";
@@ -22,17 +22,17 @@ type {{ENTITY_NAME}}FormProps =
         defaultValues?: Partial<{{ENTITY_NAME}}CreateFormData>;
         submitLabel: string;
         onCancel: () => void;
-        onSubmit: (data: {{ENTITY_NAME}}CreateFormData) => void | Promise<void>;
+        onSubmit: (data: {{ENTITY_NAME}}CreateFormData, form: UseFormReturn<{{ENTITY_NAME}}FormData>) => void | Promise<void>;
     }
     | {
         mode: "edit";
         defaultValues?: Partial<{{ENTITY_NAME}}UpdateFormData>;
         submitLabel: string;
         onCancel: () => void;
-        onSubmit: (data: {{ENTITY_NAME}}UpdateFormData) => void | Promise<void>;
+        onSubmit: (data: {{ENTITY_NAME}}UpdateFormData, form: UseFormReturn<{{ENTITY_NAME}}FormData>) => void | Promise<void>;
     };
 
-type {{ENTITY_NAME}}FormData = {{ENTITY_NAME}}CreateFormData | {{ENTITY_NAME}}UpdateFormData;
+export type {{ENTITY_NAME}}FormData = {{ENTITY_NAME}}CreateFormData | {{ENTITY_NAME}}UpdateFormData;
 
 export function {{ENTITY_NAME}}Form(props: {{ENTITY_NAME}}FormProps) {
     const { t } = useI18n();
@@ -56,7 +56,7 @@ export function {{ENTITY_NAME}}Form(props: {{ENTITY_NAME}}FormProps) {
             </CardHeader>
 
             <CardContent>
-                <form onSubmit={form.handleSubmit(props.onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit((data) => props.onSubmit(data as never, form))} className="space-y-6">
                     <div className="grid gap-5">
 {{FORM_FIELDS}}
                     </div>

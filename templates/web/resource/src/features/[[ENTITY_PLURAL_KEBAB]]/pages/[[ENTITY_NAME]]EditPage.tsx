@@ -1,7 +1,8 @@
 import { {{EDIT_ROUTER_IMPORTS}} } from "react-router";
+import type { UseFormReturn } from "react-hook-form";
 
-import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, useI18n } from "@gasi/core-ui";
-import { {{ENTITY_NAME}}Form } from "../components/{{ENTITY_NAME}}Form";
+import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, applyApiFieldErrors, useI18n } from "@gasi/core-ui";
+import { {{ENTITY_NAME}}Form, type {{ENTITY_NAME}}FormData } from "../components/{{ENTITY_NAME}}Form";
 import { use{{ENTITY_NAME}}, useUpdate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_NAME}}";
 import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_VAR}}UpdateSchema";
 
@@ -18,12 +19,15 @@ export function {{ENTITY_NAME}}EditPage() {
         return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
     }
 
-    const handleSubmit = async (data: {{ENTITY_NAME}}UpdateFormData) => {
+    const handleSubmit = async (data: {{ENTITY_NAME}}UpdateFormData, form: UseFormReturn<{{ENTITY_NAME}}FormData>) => {
         try {
             await update{{ENTITY_NAME}}.mutateAsync({ id: params.id as string, data });
             appToast.success(t("common.messages.updateSuccess", { entity: singularEntity }));
             navigate({{NAVIGATE_AFTER_SAVE}});
         } catch (error) {
+            if (applyApiFieldErrors(form, error)) {
+                return;
+            }
             appToast.error(error, t("common.messages.updateError", { entity: singularEntity }));
         }
     };
