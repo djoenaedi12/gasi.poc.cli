@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2026 PT Gunatronikatama Cipta ("GASI").
+ * All rights reserved.
+ *
+ * CONFIDENTIAL & PROPRIETARY - TRADE SECRET (to the maximum extent permitted by law)
+ *
+ * This source code, including all associated materials, documentation, designs,
+ * algorithms, interfaces, and know-how (collectively, the "Work") is the exclusive
+ * property of PT Gunatronikatama Cipta and/or its licensors, and is protected by
+ * applicable copyright, trade secret, and other intellectual property laws.
+ *
+ * NO LICENSE / RESTRICTED RIGHTS:
+ * No right or license, express or implied, is granted under any patent, copyright,
+ * trade secret, trademark, or other intellectual property right of PT Gunatronikatama
+ * Cipta by the provision of this source code, except as expressly set forth in a
+ * written agreement signed by an authorized representative of PT Gunatronikatama Cipta.
+ * Any use not expressly authorized is prohibited.
+ *
+ * AUTHORIZED USE ONLY:
+ * This Work is intended solely for PT Gunatronikatama Cipta internal operational use
+ * and/or for providing services as part of PT Gunatronikatama Cipta's Software-as-a-Service
+ * (SaaS) offerings, as applicable.
+ *
+ * PROHIBITED ACTS (in addition acts prohibited by law):
+ * You may not copy, reproduce, modify, adapt, translate, create derivative works from,
+ * distribute, publish, display, perform, sublicense, transfer, rent, lease, lend, sell,
+ * disclose, or make available this Work, in whole or in part, to any third party without
+ * prior written consent of PT Gunatronikatama Cipta. Reverse engineering, decompilation,
+ * disassembly, or attempts to derive source code, underlying ideas, or algorithms are
+ * prohibited to the maximum extent permitted by law.
+ *
+ * DELIVERY / SOURCE CODE ACCESS RESTRICTIONS (if applicable):
+ * Where any software is provided to a customer, the customer receives object code only
+ * (e.g., executable, bytecode, or otherwise non-human-readable form) and no right of access
+ * to the source code. PT Gunatronikatama Cipta does not provide, and the customer is not
+ * permitted to obtain, the source code except where expressly required by applicable law
+ * or explicitly granted in a written agreement signed by an authorized representative of
+ * PT Gunatronikatama Cipta.
+ *
+ * OWNERSHIP OF MODIFICATIONS:
+ * Any modifications, enhancements, or derivative works to this Work made by or for
+ * PT Gunatronikatama Cipta (or under its direction) are owned exclusively by
+ * PT Gunatronikatama Cipta, unless otherwise agreed in writing.
+ *
+ * THIRD-PARTY / OPEN SOURCE:
+ * Portions of this codebase may incorporate third-party software and/or open-source
+ * components, which are subject to their respective license terms. In case of conflict,
+ * the applicable third-party license terms govern for those components only.
+ *
+ * REMEDIES:
+ * Unauthorized use, access, copying, or disclosure may cause irreparable harm.
+ * PT Gunatronikatama Cipta may seek injunctive relief and all other remedies available
+ * under law and applicable agreements.
+ *
+ * GOVERNING LAW:
+ * Unless otherwise stated in a controlling written agreement, this notice and any dispute
+ * related to this Work shall be governed by the laws of the Republic of Indonesia.
+ */

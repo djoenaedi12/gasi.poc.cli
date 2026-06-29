@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 const { Command } = require('commander');
 const chalk = require('chalk');
-const pluginCreate = require('../lib/commands/plugin-create');
 const pluginBuild = require('../lib/commands/plugin-build');
 const pluginClean = require('../lib/commands/plugin-clean');
 const pluginDelete = require('../lib/commands/plugin-delete');
 const pluginDeploy = require('../lib/commands/plugin-deploy');
 const pluginList = require('../lib/commands/plugin-list');
-const resourceCreate = require('../lib/commands/resource-create');
+const pluginPlan = require('../lib/commands/plugin-plan');
+const pluginSync = require('../lib/commands/plugin-sync');
+const pluginValidate = require('../lib/commands/plugin-validate');
 const resourceDelete = require('../lib/commands/resource-delete');
+const resourcePlan = require('../lib/commands/resource-plan');
+const resourceSync = require('../lib/commands/resource-sync');
+const resourceValidate = require('../lib/commands/resource-validate');
 const uploaderCreate = require('../lib/commands/uploader-create');
 const pkg = require('../package.json');
 
@@ -24,27 +28,33 @@ const plugin = program
     .description('Manage plugin scaffolding, build, and runtime deployment lifecycle');
 
 plugin
-    .command('create')
-    .description('Generate a new plugin skeleton')
-    .option('-n, --name <name>', 'Plugin name (example: hr)')
-    .option('-t, --target <target>', 'Generator target: api, web, or all (default: all)', 'all')
-    .option('--plugin-prefix <prefix>', 'Optional plugin table prefix (API only)')
-    .option('-d, --domain <domain>', 'Java domain package name (API only)')
-    .option('-p, --package <package>', 'Base package (API only, default: gasi.gps)')
-    .option('-v, --plugin-version <version>', 'Plugin version (default: 1.0.0)')
-    .option('--description <desc>', 'Plugin description')
-    .option(
-        '--depends-on <dep>',
-        'Plugin dependency (API only). Can be repeated.',
-        (val, prev) => prev.concat(val.split(',').map((s) => s.trim()).filter(Boolean)),
-        [],
-    )
-    .option('--no-flyway', 'Skip Flyway migration sample (API only)')
-    .option('--no-register', 'Skip auto-register in parent pom.xml (API only)')
-    .option('-y, --yes', 'Skip interactive prompts and use defaults')
+    .command('validate')
+    .description('Validate plugin definition JSON')
     .option('--cwd <path>', 'Root project directory (default: cwd)')
+    .requiredOption('--target <target>', 'Generator target: api or web')
+    .requiredOption('-f, --file <file>', 'Plugin definition file (JSON)')
     .action(async (opts) => {
-        try { await pluginCreate(opts); } catch (err) { handleError(err); }
+        try { await pluginValidate(opts); } catch (err) { handleError(err); }
+    });
+
+plugin
+    .command('plan')
+    .description('Show plugin sync plan from JSON')
+    .option('--cwd <path>', 'Root project directory (default: cwd)')
+    .requiredOption('--target <target>', 'Generator target: api or web')
+    .requiredOption('-f, --file <file>', 'Plugin definition file (JSON)')
+    .action(async (opts) => {
+        try { await pluginPlan(opts); } catch (err) { handleError(err); }
+    });
+
+plugin
+    .command('sync')
+    .description('Generate plugin skeleton from JSON')
+    .option('--cwd <path>', 'Root project directory (default: cwd)')
+    .requiredOption('--target <target>', 'Generator target: api or web')
+    .requiredOption('-f, --file <file>', 'Plugin definition file (JSON)')
+    .action(async (opts) => {
+        try { await pluginSync(opts); } catch (err) { handleError(err); }
     });
 
 plugin
@@ -110,23 +120,42 @@ const resource = program
     .description('Manage resource scaffolding');
 
 resource
-    .command('create [entityName]')
-    .description('Generate a full CRUD resource inside an existing plugin')
+    .command('validate')
+    .description('Validate resource definition JSON files')
     .option('--cwd <path>', 'Root project (default: cwd)')
-    .option('--target <target>', 'Generator target: api, web, or all (default: api)', 'api')
-    .option('--web-dir <path>', 'Frontend plugin root for --target web/all')
-    .option('--web-force', 'Overwrite existing generated web files')
-    .option('-y, --yes', 'Skip confirmation prompt')
     .option('-f, --file <file>', 'Resource definition file (JSON). Can be repeated.', collect, [])
-    .action(async (entityName, opts) => {
-        try { await resourceCreate(entityName, opts); } catch (err) { handleError(err); }
+    .action(async (opts) => {
+        try { await resourceValidate(opts); } catch (err) { handleError(err); }
+    });
+
+resource
+    .command('plan')
+    .description('Compare resource JSON files with the generated resource manifest')
+    .option('--cwd <path>', 'Root project (default: cwd)')
+    .requiredOption('--target <target>', 'Generator target: api or web')
+    .requiredOption('--plugin <module>', 'Target plugin module/path')
+    .option('-f, --file <file>', 'Resource definition file (JSON). Can be repeated.', collect, [])
+    .action(async (opts) => {
+        try { await resourcePlan(opts); } catch (err) { handleError(err); }
+    });
+
+resource
+    .command('sync')
+    .description('Generate resources from JSON and skip unchanged resources')
+    .option('--cwd <path>', 'Root project (default: cwd)')
+    .requiredOption('--target <target>', 'Generator target: api or web')
+    .requiredOption('--plugin <module>', 'Target plugin module/path')
+    .option('-f, --file <file>', 'Resource definition file (JSON). Can be repeated.', collect, [])
+    .action(async (opts) => {
+        try { await resourceSync(opts); } catch (err) { handleError(err); }
     });
 
 resource
     .command('delete <entityName>')
-    .description('Delete all generated resource files for an entity')
+    .description('Delete generated resource files listed in the target manifest')
     .option('--cwd <path>', 'Root project (default: cwd)')
-    .option('--include-migration', 'Also delete Flyway migration SQL files')
+    .requiredOption('--target <target>', 'Generator target: api or web')
+    .requiredOption('--plugin <module>', 'Target plugin module/path')
     .option('-y, --yes', 'Skip confirmation prompt')
     .action(async (entityName, opts) => {
         try { await resourceDelete(entityName, opts); } catch (err) { handleError(err); }

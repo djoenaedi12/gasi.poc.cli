@@ -17,5 +17,5 @@ import type { RouteDefinition } from '@gasi/core-api';
  *   ];
  */
 export const {{PLUGIN_NAME_CAMEL}}Routes: RouteDefinition[] = [
-  // routes akan ditambahkan oleh `gasi resource create`
+  // routes akan ditambahkan oleh `gasi resource sync`
 ];

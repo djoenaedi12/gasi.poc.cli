@@ -24,40 +24,61 @@ Semua command plugin mendukung `--target api | web | all`.
 
 ---
 
-### `gasi plugin create`
+### `gasi plugin validate`
 
-Generate skeleton plugin baru.
+Validasi file definisi plugin tanpa generate file.
 
 ```bash
-# Interactive (default target: all)
-gasi plugin create
+gasi plugin validate --target api -f hr-plugin.json
+gasi plugin validate --target web -f hr-plugin.json
+```
 
-# Web plugin saja
-gasi plugin create --target web --name hr
+### `gasi plugin plan`
 
-# API plugin saja
-gasi plugin create --target api --name hr
+Tampilkan rencana generate plugin dari JSON.
 
-# Keduanya
-gasi plugin create --target all --name hr -y
+```bash
+gasi plugin plan --target api -f hr-plugin.json
+gasi plugin plan --target web -f hr-plugin.json
+```
+
+### `gasi plugin sync`
+
+Generate skeleton plugin dari JSON. Kalau folder plugin sudah ada, command akan skip sebagai `UNCHANGED`.
+
+```bash
+gasi plugin sync --target api -f hr-plugin.json
+gasi plugin sync --target web -f hr-plugin.json
 ```
 
 **Opsi:**
 
 | Flag | Keterangan |
 |---|---|
-| `-n, --name <name>` | Nama plugin (contoh: `hr`) |
-| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `all`) |
-| `--plugin-prefix <prefix>` | Prefix tabel plugin (API only) |
-| `-d, --domain <domain>` | Nama package domain Java (API only) |
-| `-p, --package <package>` | Base package (API only, default: `gasi.gps`) |
-| `-v, --plugin-version <version>` | Versi plugin (default: `1.0.0`) |
-| `--description <desc>` | Deskripsi plugin |
-| `--depends-on <dep>` | Dependensi plugin lain (API only, bisa diulang) |
-| `--no-flyway` | Skip sample Flyway migration (API only) |
-| `--no-register` | Skip auto-register di parent `pom.xml` (API only) |
-| `-y, --yes` | Skip prompt interaktif, gunakan default |
+| `--target <target>` | Wajib. Target: `api` atau `web` |
+| `-f, --file <file>` | Wajib. File definisi plugin JSON |
 | `--cwd <path>` | Root project directory (default: cwd) |
+
+Contoh `hr-plugin.json`:
+
+```json
+{
+  "name": "hr",
+  "version": "1.0.0",
+  "description": "Human resource plugin",
+  "api": {
+    "domain": "hr",
+    "package": "gasi.gps",
+    "pluginPrefix": "hr",
+    "dependsOn": [],
+    "flyway": true,
+    "register": true
+  },
+  "web": {
+    "displayName": "HR"
+  }
+}
+```
 
 **Output web plugin** (`plugins/hr-plugin/`):
 ```
@@ -234,37 +255,81 @@ gasi plugin list
 
 ---
 
-### `gasi resource create`
+### `gasi resource validate`
 
-Generate full CRUD resource di dalam plugin yang sudah ada.
+Validasi file definisi resource tanpa generate file.
 
 ```bash
-# API resource (interactive)
-gasi resource create Employee --cwd plugins/hr-plugin
-
-# Web resource di dalam plugin
-gasi resource create Employee --target web --web-dir plugins/hr-plugin
-
-# API + Web sekaligus dari file definisi
-gasi resource create --target all --web-dir plugins/hr-plugin -f resource.json
-
-# Multiple file sekaligus
-gasi resource create --target api -f employee.json -f department.json
-
-# Overwrite file web yang sudah ada
-gasi resource create --target web --web-dir plugins/hr-plugin -f resource.json --web-force
+gasi resource validate -f employee.json
+gasi resource validate -f employee.json -f department.json
 ```
 
-**Opsi:**
+### `gasi resource plan`
+
+Bandingkan file JSON dengan manifest generated resource.
+
+```bash
+gasi resource plan --target api --plugin plugins/hr-plugin -f employee.json
+gasi resource plan --target web --plugin plugins/hr-plugin -f employee.json
+```
+
+Status yang ditampilkan:
+
+| Status | Keterangan |
+|---|---|
+| `CREATE` | Resource belum pernah tercatat di manifest |
+| `UPDATE` | Resource sudah ada, tapi hash JSON berubah |
+| `UNCHANGED` | Resource sama dengan manifest, aman dilewati saat sync |
+
+### `gasi resource sync`
+
+Generate resource dari JSON sebagai source of truth. Resource yang tidak berubah akan dilewati berdasarkan manifest.
+
+```bash
+gasi resource sync --target api --plugin plugins/hr-plugin -f employee.json
+gasi resource sync --target api --plugin plugins/hr-plugin -f employee.json -f department.json
+gasi resource sync --target web --plugin plugins/hr-plugin -f employee.json
+```
+
+Manifest dibuat per plugin dan per target:
+
+| Target | Manifest |
+|---|---|
+| `api` | `<plugin-api>/.gasi/generated-api-resources.json` |
+| `web` | `<plugin-web>/.gasi/generated-web-resources.json` |
+
+Manifest ini dipakai untuk idempotency: rerun `sync` dengan JSON yang sama tidak akan membuat migration baru atau menulis ulang file resource yang sama.
+
+> Untuk perubahan schema, update JSON terlebih dulu lalu jalankan `gasi resource plan`. Kalau status `UPDATE`, review dampak migration dan generated file sebelum sync.
+
+**Opsi resource:**
 
 | Flag | Keterangan |
 |---|---|
-| `--target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
-| `--web-dir <path>` | Root frontend plugin untuk `--target web/all` |
-| `--web-force` | Overwrite file web yang sudah digenerate |
+| `--target <target>` | Wajib untuk `plan` dan `sync`. Target: `api` atau `web` |
+| `--plugin <module>` | Wajib untuk `plan` dan `sync`. Untuk API: plugin module. Untuk web: folder plugin web. |
 | `-f, --file <file>` | File definisi resource (JSON). Bisa diulang untuk multi-file. |
-| `-y, --yes` | Skip konfirmasi |
 | `--cwd <path>` | Root project directory (default: cwd) |
+
+### Generated vs Custom
+
+File API yang dibuat generator diberi header:
+
+```java
+// Generated by gasi CLI from resource JSON. Do not edit directly.
+```
+
+Aturannya:
+
+| Area | Tempat perubahan |
+|---|---|
+| Field, DTO, validasi, table, relasi | Update file JSON lalu generate/sync ulang |
+| Service lifecycle tambahan | Tambah class hook custom dengan `@ResourceHook(value = "...", layer = HookLayer.SERVICE)` |
+| Controller lifecycle tambahan | Tambah class hook custom dengan `@ResourceHook(value = "...", layer = HookLayer.CONTROLLER)` |
+| Endpoint baru dengan prefix URL sama | Tambah controller custom dengan `@RequestMapping` prefix yang sama dan method path berbeda |
+| Repository/mapper custom behavior | Tambah hook layer `REPOSITORY` atau `MAPPER` |
+
+Jangan edit file generated untuk custom behavior. File custom dibuat terpisah supaya generator bisa dijalankan ulang tanpa menimpa logic developer.
 
 **Output web resource** mengikuti naming convention `gasi.poc.web`:
 
@@ -302,27 +367,27 @@ src/features/employees/
 
 ### `gasi resource delete <entityName>`
 
-Hapus semua file resource API yang sudah di-generate.
+Hapus file generated resource yang tercatat di manifest target, lalu hapus entry manifest-nya. Folder kosong akan dibersihkan sampai batas plugin/root target.
 
 ```bash
-gasi resource delete Employee
+gasi resource delete Employee --target api --plugin plugins/hr-plugin
 
-# Termasuk hapus migration SQL
-gasi resource delete Employee --include-migration
+gasi resource delete Employee --target web --plugin plugins/hr-plugin
 
 # Skip konfirmasi
-gasi resource delete Employee -y
+gasi resource delete Employee --target api --plugin plugins/hr-plugin -y
 ```
 
 **Opsi:**
 
 | Flag | Keterangan |
 |---|---|
-| `--include-migration` | Hapus juga file Flyway migration SQL |
+| `--target <target>` | Wajib. Target: `api` atau `web` |
+| `--plugin <module>` | Wajib. Untuk API: plugin module. Untuk web: folder plugin web. |
 | `-y, --yes` | Skip konfirmasi |
 | `--cwd <path>` | Root project directory (default: cwd) |
 
-> Migration SQL tidak dihapus secara default. Gunakan `--include-migration` untuk menghapusnya.
+Delete tidak menebak file berdasarkan nama entity. File yang dihapus hanya yang ada di `.gasi/generated-api-resources.json` atau `.gasi/generated-web-resources.json`.
 
 ---
 

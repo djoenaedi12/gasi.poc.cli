@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 {{CONTROLLER_BASE_IMPORT}}
+import gasi.gps.core.starter.application.hook.ResourceControllerHookRegistry;
 import gasi.gps.core.starter.infrastructure.util.IdEncoder;
 import {{FULL_PACKAGE}}.application.dto.{{ENTITY_NAME}}DetailResponse;
 import {{FULL_PACKAGE}}.application.dto.{{ENTITY_NAME}}SummaryResponse;

@@ -1,0 +1,11 @@
+{
+  "name": "coba",
+  "version": "1.0.0",
+  "description": "Coba sample plugin for API and web generator coverage",
+  "domain": "coba",
+  "package": "gasi.gps",
+  "pluginPrefix": "coba",
+  "dependsOn": [],
+  "flyway": true,
+  "register": true
+}

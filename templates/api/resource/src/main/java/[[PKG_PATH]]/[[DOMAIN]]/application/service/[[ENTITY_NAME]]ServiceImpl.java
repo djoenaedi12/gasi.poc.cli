@@ -19,14 +19,12 @@ public class {{ENTITY_NAME}}ServiceImpl
 
 {{SERVICE_FIELDS}}
     public {{ENTITY_NAME}}ServiceImpl({{SERVICE_CONSTRUCTOR_PARAMS}}) {
-        super(repositoryPort, dtoMapper, messageUtil, idEncoder);
+        super({{SERVICE_SUPER_ARGS}});
 {{SERVICE_CONSTRUCTOR_ASSIGNMENTS}}
     }
 
     @Override
-    protected String resourceType() {
+    public String resourceType() {
         return "{{ENTITY_NAME}}";
     }
-
-{{SERVICE_REFERENCE_METHODS}}
 }

@@ -192,7 +192,8 @@
         "table": {
           "searchFields": [
             "employeeNo",
-            "fullName"
+            "fullName",
+            "email"
           ],
           "filters": [
             {
@@ -802,6 +803,218 @@
           "required": true,
           "filterable": true,
           "defaultColumn": true
+        }
+      ]
+    },
+    {
+      "entityName": "EmployeeAssignmentSnapshot",
+      "mode": "read",
+      "fields": [
+        {
+          "name": "employee",
+          "type": "ManyToOne",
+          "refEntity": "Employee",
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true
+        },
+        {
+          "name": "snapshotStatus",
+          "type": "Enum",
+          "enumName": "EmployeeAssignmentSnapshotStatus",
+          "values": [
+            "PLANNED",
+            "ACTIVE",
+            "EXPIRED"
+          ],
+          "required": true,
+          "filterable": true,
+          "defaultColumn": true
+        },
+        {
+          "name": "effectiveAt",
+          "type": "Instant",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "futureOrPresent": true
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "notes",
+          "type": "Text",
+          "required": false,
+          "filterable": false,
+          "dto": {
+            "create": false,
+            "update": false,
+            "summary": false,
+            "detail": true
+          }
+        }
+      ]
+    },
+    {
+      "entityName": "ApiPolicy",
+      "mode": "crud",
+      "fields": [
+        {
+          "name": "policyCode",
+          "type": "String",
+          "length": 80,
+          "required": true,
+          "unique": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 80,
+            "pattern": "^[A-Z0-9_.-]+$",
+            "patternMessage": "Policy code must contain uppercase letters, numbers, dot, underscore, or dash only"
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "retryLimit",
+          "type": "Integer",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "positiveOrZero": true
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "priorityOffset",
+          "type": "Long",
+          "required": false,
+          "filterable": true,
+          "validation": {
+            "negative": true
+          },
+          "defaultColumn": false
+        },
+        {
+          "name": "balanceAdjustment",
+          "type": "BigDecimal",
+          "required": false,
+          "filterable": true,
+          "validation": {
+            "negativeOrZero": true
+          },
+          "defaultColumn": false
+        },
+        {
+          "name": "startsOn",
+          "type": "Date",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "future": true
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "requiresAcknowledgement",
+          "type": "Boolean",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "assertTrue": true
+          },
+          "defaultColumn": false
+        },
+        {
+          "name": "archived",
+          "type": "Boolean",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "assertFalse": true
+          },
+          "defaultColumn": false
+        }
+      ]
+    },
+    {
+      "entityName": "EmployeeCertification",
+      "mode": "crud",
+      "parent": "Employee",
+      "fields": [
+        {
+          "name": "certificationName",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "issuer",
+          "type": "String",
+          "length": 150,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 2,
+            "maxLength": 150
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "expiresOn",
+          "type": "Date",
+          "required": false,
+          "filterable": true,
+          "validation": {
+            "future": true
+          },
+          "defaultColumn": false
+        }
+      ]
+    },
+    {
+      "entityName": "EmployeeInternalToken",
+      "mode": "crud",
+      "parent": "Employee",
+      "embedInParentDto": false,
+      "exposeApi": false,
+      "fields": [
+        {
+          "name": "tokenName",
+          "type": "String",
+          "length": 120,
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "expiresAt",
+          "type": "DateTime",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "futureOrPresent": true
+          },
+          "defaultColumn": true
+        },
+        {
+          "name": "revoked",
+          "type": "Boolean",
+          "required": true,
+          "filterable": true,
+          "validation": {
+            "assertFalse": true
+          },
+          "defaultColumn": false
         }
       ]
     }
