@@ -1,19 +1,31 @@
 import { {{EDIT_ROUTER_IMPORTS}} } from "react-router";
+import type { ReactNode } from "react";
 import type { UseFormReturn } from "react-hook-form";
 
-import { CardTabs, CardTabsContent, CardTabsList, CardTabsTrigger, PageHeader, appToast, applyApiFieldErrors, useI18n } from "@gasi/core-ui";
+import { PageHeader, appToast, applyApiFieldErrors, getResourceCustom, useI18n } from "@gasi/core-ui";
 import { {{ENTITY_NAME}}Form, type {{ENTITY_NAME}}FormData } from "../components/{{ENTITY_NAME}}Form";
 import { use{{ENTITY_NAME}}, useUpdate{{ENTITY_NAME}} } from "../hooks/use{{ENTITY_NAME}}";
 import type { {{ENTITY_NAME}}UpdateFormData } from "../schemas/{{ENTITY_VAR}}UpdateSchema";
+
+type {{ENTITY_NAME}}EditCustom = {
+    edit?: {
+        headerActions?: (actions: ReactNode) => ReactNode;
+        beforeSubmit?: (data: {{ENTITY_NAME}}UpdateFormData) => {{ENTITY_NAME}}UpdateFormData | Promise<{{ENTITY_NAME}}UpdateFormData>;
+        afterSubmit?: (result: unknown, data: {{ENTITY_NAME}}UpdateFormData) => void | Promise<void>;
+    };
+};
 
 export function {{ENTITY_NAME}}EditPage() {
     const navigate = useNavigate();
     const params = useParams();
     const { t } = useI18n();
+    const custom = getResourceCustom<{{ENTITY_NAME}}EditCustom>("{{ENTITY_VAR}}");
 {{EDIT_PARENT_SETUP}}
     const {{ENTITY_VAR}}Query = use{{ENTITY_NAME}}({{DETAIL_QUERY_ARGS}});
     const update{{ENTITY_NAME}} = useUpdate{{ENTITY_NAME}}({{UPDATE_HOOK_ARGS}});
     const singularEntity = t("{{I18N_KEY_PREFIX}}.names.singular");
+    const defaultHeaderActions = null;
+    const headerActions = custom.edit?.headerActions?.(defaultHeaderActions) ?? defaultHeaderActions;
 
     if (!params.id) {
         return <Navigate to={ {{NAVIGATE_LIST}} } replace />;
@@ -21,7 +33,9 @@ export function {{ENTITY_NAME}}EditPage() {
 
     const handleSubmit = async (data: {{ENTITY_NAME}}UpdateFormData, form: UseFormReturn<{{ENTITY_NAME}}FormData>) => {
         try {
-            await update{{ENTITY_NAME}}.mutateAsync({ id: params.id as string, data });
+            const payload = (await custom.edit?.beforeSubmit?.(data)) ?? data;
+            const result = await update{{ENTITY_NAME}}.mutateAsync({ id: params.id as string, data: payload });
+            await custom.edit?.afterSubmit?.(result, payload);
             appToast.success(t("common.messages.updateSuccess", { entity: singularEntity }));
             navigate({{NAVIGATE_AFTER_SAVE}});
         } catch (error) {
@@ -57,22 +71,17 @@ export function {{ENTITY_NAME}}EditPage() {
                 description={t("common.descriptions.updateEntity", { entity: singularEntity })}
                 breadcrumbLabels={{ [params.id as string]: breadcrumbLabel }}
                 {{EDIT_BREADCRUMBS}}
+                actions={headerActions}
             />
-            <CardTabs defaultValue="general" className="w-full max-w-3xl">
-                <CardTabsList>
-                    <CardTabsTrigger value="general">{t("common.tabs.general")}</CardTabsTrigger>
-                </CardTabsList>
-
-                <CardTabsContent value="general">
-                    <{{ENTITY_NAME}}Form
-                        mode="edit"
-                        defaultValues={{{ENTITY_VAR}}}
-                        submitLabel={update{{ENTITY_NAME}}.isPending ? t("common.actions.saving") : t("common.actions.save")}
-                        onCancel={() => navigate({{NAVIGATE_AFTER_SAVE}})}
-                        onSubmit={handleSubmit}
-                    />
-                </CardTabsContent>
-            </CardTabs>
+            <div className="w-full max-w-5xl">
+                <{{ENTITY_NAME}}Form
+                    mode="edit"
+                    defaultValues={{{ENTITY_VAR}}}
+                    submitLabel={update{{ENTITY_NAME}}.isPending ? t("common.actions.saving") : t("common.actions.save")}
+                    onCancel={() => navigate({{NAVIGATE_AFTER_SAVE}})}
+                    onSubmit={handleSubmit}
+                />
+            </div>
         </div>
     );
 }

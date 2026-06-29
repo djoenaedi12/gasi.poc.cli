@@ -45,6 +45,111 @@
               "label": "Name"
             }
           ]
+        },
+        "create": {
+          "tabs": [
+            {
+              "id": "general",
+              "title": "General",
+              "sections": [
+                {
+                  "title": "Department Info",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "code"
+                        },
+                        {
+                          "span": 3,
+                          "field": "name"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "description"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "edit": {
+          "tabs": [
+            {
+              "id": "general",
+              "title": "General",
+              "sections": [
+                {
+                  "title": "Department Info",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "code"
+                        },
+                        {
+                          "span": 3,
+                          "field": "name"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "description"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "detail": {
+          "tabs": [
+            {
+              "id": "general",
+              "title": "General",
+              "sections": [
+                {
+                  "title": "Department Info",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "code"
+                        },
+                        {
+                          "span": 3,
+                          "field": "name"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "description"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       },
       "fields": [
@@ -189,6 +294,155 @@
       "entityName": "Employee",
       "mode": "crud",
       "ui": {
+        "detail": {
+          "tabs": [
+            {
+              "id": "general",
+              "title": "General",
+              "sections": [
+                {
+                  "title": "Identity",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "employeeNo"
+                        },
+                        {
+                          "span": 3,
+                          "field": "fullName"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "email"
+                        },
+                        {
+                          "span": 1,
+                          "field": "phoneNumber"
+                        },
+                        {
+                          "span": 1,
+                          "field": "active"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "bio"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Employment",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "department"
+                        },
+                        {
+                          "span": 1,
+                          "field": "jobTitle"
+                        },
+                        {
+                          "span": 1,
+                          "field": "status"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "age"
+                        },
+                        {
+                          "span": 1,
+                          "field": "birthDate"
+                        },
+                        {
+                          "span": 1,
+                          "field": "joinedAt"
+                        },
+                        {
+                          "span": 1,
+                          "field": "lastLoginAt"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Compensation",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 2,
+                          "field": "salary"
+                        },
+                        {
+                          "span": 1,
+                          "field": "performanceScore"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "nationalId"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "notes"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "certification-identification",
+              "title": "Certification & Identification",
+              "children": [
+                {
+                  "resource": "EmployeeCertification",
+                  "title": "Certifications"
+                },
+                {
+                  "resource": "EmployeeInternalToken",
+                  "title": "Identifications"
+                }
+              ]
+            },
+            {
+              "id": "assets",
+              "title": "Assets",
+              "children": [
+                {
+                  "resource": "EmployeeAsset",
+                  "title": "Assets"
+                }
+              ]
+            }
+          ]
+        },
         "table": {
           "searchFields": [
             "employeeNo",
@@ -294,6 +548,274 @@
             {
               "field": "status",
               "label": "Status"
+            }
+          ]
+        },
+        "create": {
+          "tabs": [
+            {
+              "id": "general",
+              "title": "General",
+              "sections": [
+                {
+                  "title": "Identity",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "employeeNo"
+                        },
+                        {
+                          "span": 3,
+                          "field": "fullName"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "email"
+                        },
+                        {
+                          "span": 1,
+                          "field": "phoneNumber"
+                        },
+                        {
+                          "span": 1,
+                          "field": "active"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "bio"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Employment",
+                  "description": "Job placement and employment status.",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "department"
+                        },
+                        {
+                          "span": 1,
+                          "field": "jobTitle"
+                        },
+                        {
+                          "span": 1,
+                          "field": "status"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "age"
+                        },
+                        {
+                          "span": 1,
+                          "field": "birthDate"
+                        },
+                        {
+                          "span": 1,
+                          "field": "joinedAt"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Compensation",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 2,
+                          "field": "salary"
+                        },
+                        {
+                          "span": 1,
+                          "field": "performanceScore"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "nationalId"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "notes"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "edit": {
+          "tabs": [
+            {
+              "id": "general",
+              "title": "General",
+              "sections": [
+                {
+                  "title": "Identity",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "employeeNo"
+                        },
+                        {
+                          "span": 3,
+                          "field": "fullName"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "email"
+                        },
+                        {
+                          "span": 1,
+                          "field": "phoneNumber"
+                        },
+                        {
+                          "span": 1,
+                          "field": "active"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "bio"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Employment",
+                  "description": "Job placement and employment status.",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "department"
+                        },
+                        {
+                          "span": 1,
+                          "field": "jobTitle"
+                        },
+                        {
+                          "span": 1,
+                          "field": "status"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "age"
+                        },
+                        {
+                          "span": 1,
+                          "field": "birthDate"
+                        },
+                        {
+                          "span": 1,
+                          "field": "joinedAt"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "title": "Compensation",
+                  "rows": [
+                    {
+                      "columns": [
+                        {
+                          "span": 2,
+                          "field": "salary"
+                        },
+                        {
+                          "span": 1,
+                          "field": "performanceScore"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "nationalId"
+                        }
+                      ]
+                    },
+                    {
+                      "columns": [
+                        {
+                          "span": 1,
+                          "field": "notes"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "certification-identification",
+              "title": "Certification & Identification",
+              "children": [
+                {
+                  "resource": "EmployeeCertification",
+                  "title": "Certifications"
+                },
+                {
+                  "resource": "EmployeeInternalToken",
+                  "title": "Identifications"
+                }
+              ]
+            },
+            {
+              "id": "assets",
+              "title": "Assets",
+              "children": [
+                {
+                  "resource": "EmployeeAsset",
+                  "title": "Assets"
+                }
+              ]
             }
           ]
         }

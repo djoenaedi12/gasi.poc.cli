@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save } from "lucide-react";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 
 {{FORM_IMPORTS}}
-import { Button, useI18n } from "@gasi/core-ui";
+import { Button, getResourceCustom, useI18n } from "@gasi/core-ui";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@gasi/core-ui";
 import {
     create{{ENTITY_NAME}}CreateSchema,
@@ -34,8 +34,24 @@ type {{ENTITY_NAME}}FormProps =
 
 export type {{ENTITY_NAME}}FormData = {{ENTITY_NAME}}CreateFormData | {{ENTITY_NAME}}UpdateFormData;
 
+type {{ENTITY_NAME}}FormCustom = {
+    form?: {
+        footerActions?: (
+            actions: ReactNode,
+            context: {
+                mode: {{ENTITY_NAME}}FormProps["mode"];
+                form: UseFormReturn<{{ENTITY_NAME}}FormData>;
+                isSubmitting: boolean;
+                onCancel: () => void;
+                submitLabel: string;
+            },
+        ) => ReactNode;
+    };
+};
+
 export function {{ENTITY_NAME}}Form(props: {{ENTITY_NAME}}FormProps) {
     const { t } = useI18n();
+    const custom = getResourceCustom<{{ENTITY_NAME}}FormCustom>("{{ENTITY_VAR}}");
     const schema = useMemo(
         () => props.mode === "create" ? create{{ENTITY_NAME}}CreateSchema(t) : create{{ENTITY_NAME}}UpdateSchema(t),
         [props.mode, t],
@@ -46,32 +62,32 @@ export function {{ENTITY_NAME}}Form(props: {{ENTITY_NAME}}FormProps) {
         defaultValues: props.defaultValues as Partial<{{ENTITY_NAME}}FormData>,
     });
 
+    const defaultFooterActions = (
+        <>
+            <Button type="button" variant="outline" onClick={props.onCancel}>
+                {t("common.actions.cancel")}
+            </Button>
+            <FormButton loading={form.formState.isSubmitting}>
+                <Save className="size-4" />
+                {props.submitLabel}
+            </FormButton>
+        </>
+    );
+    const footerActions = custom.form?.footerActions?.(defaultFooterActions, {
+        mode: props.mode,
+        form,
+        isSubmitting: form.formState.isSubmitting,
+        onCancel: props.onCancel,
+        submitLabel: props.submitLabel,
+    }) ?? defaultFooterActions;
+
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{t("common.tabs.general")}</CardTitle>
-                <CardDescription>
-                    {t("common.descriptions.generalEntityInfo", { entity: t("{{I18N_KEY_PREFIX}}.names.singular") })}
-                </CardDescription>
-            </CardHeader>
-
-            <CardContent>
-                <form onSubmit={form.handleSubmit((data) => props.onSubmit(data as never, form))} className="space-y-6">
-                    <div className="grid gap-5">
+        <form onSubmit={form.handleSubmit((data) => props.onSubmit(data as never, form))} className="space-y-6">
 {{FORM_FIELDS}}
-                    </div>
 
-                    <div className="flex justify-end gap-2 border-t pt-5">
-                        <Button type="button" variant="outline" onClick={props.onCancel}>
-                            {t("common.actions.cancel")}
-                        </Button>
-                        <FormButton loading={form.formState.isSubmitting}>
-                            <Save className="size-4" />
-                            {props.submitLabel}
-                        </FormButton>
-                    </div>
-                </form>
-            </CardContent>
-        </Card>
+            <div className="flex justify-end gap-2 border-t pt-5">
+                {footerActions}
+            </div>
+        </form>
     );
 }

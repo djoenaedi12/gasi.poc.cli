@@ -9,14 +9,17 @@
 {{LIST_FILTER_IMPORTS}}
 {{LIST_LOOKUP_IMPORTS}}
 {{LIST_BUTTON_IMPORT}}
-import { ResourceListPage, useI18n } from "@gasi/core-ui";
+import { ResourceListPage, getResourceCustom, useI18n } from "@gasi/core-ui";
 {{LIST_TOAST_IMPORT}}
 import { get{{ENTITY_NAME}}Columns } from "../components/{{ENTITY_NAME}}Columns";
 import { {{LIST_DELETE_IMPORT}} } from "../hooks/use{{ENTITY_NAME}}";
 
+{{LIST_CUSTOM_TYPE}}
+
 export function {{ENTITY_NAME}}ListPage() {
 {{LIST_NAVIGATE_SETUP}}
     const { t } = useI18n();
+    const custom = getResourceCustom<{{ENTITY_NAME}}ListCustom>("{{ENTITY_VAR}}");
 {{LIST_PARENT_SETUP}}
 {{LIST_PERMISSIONS}}
 {{ADVANCED_FILTER_STATE}}
@@ -27,18 +30,24 @@ export function {{ENTITY_NAME}}ListPage() {
 {{ADVANCED_FILTER_LOGIC}}
 
     const columns = useMemo(
-        () => get{{ENTITY_NAME}}Columns({
+        () => {
+            const baseColumns = get{{ENTITY_NAME}}Columns({
             {{LIST_COLUMNS_CONFIG}}
-        }),
+            });
+
+            return custom.list?.columns?.(baseColumns) ?? baseColumns;
+        },
         {{LIST_COLUMNS_DEPS}},
     );
+{{LIST_PAGE_QUERY}}
+{{LIST_HEADER_ACTIONS_SETUP}}
 
     return (
         <ResourceListPage
             title={pluralEntity}
             description={t("common.descriptions.manageEntityMasterData", { entity: pluralEntity })}
             {{LIST_BREADCRUMBS}}
-            {{LIST_HEADER_ACTIONS}}
+            actions={headerActions}
             columns={columns}
             table={{
                 {{PAGE_QUERY_PROP}}
