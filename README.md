@@ -1,65 +1,158 @@
-# gasi CLI
+# GASI CLI
 
-Developer toolkit untuk scaffolding plugin dan resource pada project GASI.
+GASI CLI adalah toolkit developer untuk membantu membuat, membangun, dan memasang plugin pada aplikasi GASI. CLI ini menghasilkan struktur backend Spring Boot + PF4J dan frontend React + Vite dari file definisi JSON, lalu membantu proses build, deploy, clean, dan delete agar pekerjaan berulang bisa dilakukan dengan cara yang konsisten.
 
-## Instalasi
+README ini ditujukan untuk developer baru yang ingin memahami alur kerja project dan mulai membuat plugin atau resource sendiri.
 
-```bash
-npm install -g .
-# atau langsung jalankan
-node bin/gasi.js
+## Daftar Isi
+
+- [Kapan Menggunakan CLI Ini](#kapan-menggunakan-cli-ini)
+- [Prasyarat](#prasyarat)
+- [Struktur Project](#struktur-project)
+- [Instalasi Lokal](#instalasi-lokal)
+- [Konsep Utama](#konsep-utama)
+- [Alur Kerja Cepat](#alur-kerja-cepat)
+- [Plugin Definition](#plugin-definition)
+- [Resource Definition](#resource-definition)
+- [Command Reference](#command-reference)
+- [Uploader Generator](#uploader-generator)
+- [Tips Aman Saat Generate](#tips-aman-saat-generate)
+- [Troubleshooting](#troubleshooting)
+
+## Kapan Menggunakan CLI Ini
+
+Gunakan GASI CLI saat ingin:
+
+- membuat skeleton plugin API atau web dari definisi JSON;
+- menambahkan resource CRUD atau read-only ke plugin;
+- membuat halaman list, detail, create, edit, service, schema, lookup, dan i18n untuk web resource;
+- membuat class, DTO, mapper, repository, service, controller, migration, dan hook untuk API resource;
+- build plugin API atau web;
+- deploy plugin hasil build ke aplikasi platform;
+- menghapus plugin atau resource yang pernah digenerate.
+
+CLI ini cocok dipakai dari root project aplikasi, bukan dari folder CLI-nya, karena sebagian besar command membaca struktur `pom.xml`, `plugins/`, dan `platform-app/`.
+
+## Prasyarat
+
+Pastikan environment lokal memiliki:
+
+- Node.js 18 atau lebih baru;
+- npm;
+- Java dan Maven untuk build plugin API;
+- akses ke root project GASI yang berisi `pom.xml`, `plugins/`, dan `platform-app/`;
+- dependency frontend sudah siap jika ingin build atau deploy plugin web.
+
+## Struktur Project
+
+Gambaran struktur yang umum dipakai:
+
+```text
+gasi-workspace/
+├── gasi-api/
+│   ├── pom.xml
+│   ├── plugins/
+│   └── platform-app/
+│       └── plugins/
+├── gasi-web/
+│   ├── platform-app/
+│   │   └── public/
+│   │       └── plugins/
+│   │           └── manifest.json
+│   └── plugins/
+└── gasi-cli/
+    ├── bin/gasi.js
+    ├── lib/
+    └── templates/
 ```
 
----
+Catatan:
 
-## Commands
+- Untuk target `api`, CLI bekerja pada project Maven dan folder `plugins/<nama>-plugin`.
+- Untuk target `web`, CLI bekerja pada workspace npm dan folder `plugins/<nama>-plugin`.
+- Deploy web akan menyalin bundle ke `platform-app/public/plugins/` dan memperbarui `platform-app/public/plugins/manifest.json`.
+- Deploy API akan menyalin JAR ke `platform-app/plugins/`.
 
-Semua command plugin mendukung `--target api | web | all`.
+## Instalasi Lokal
 
-| Target | Keterangan |
-|---|---|
-| `api` | Hanya Spring Boot + PF4J (Maven) |
-| `web` | Hanya React + Vite (npm) |
-| `all` | Keduanya sekaligus |
-
----
-
-### `gasi plugin validate`
-
-Validasi file definisi plugin tanpa generate file.
+Dari folder `gasi-cli`:
 
 ```bash
-gasi plugin validate --target api -f hr-plugin.json
-gasi plugin validate --target web -f hr-plugin.json
+npm install
 ```
 
-### `gasi plugin plan`
-
-Tampilkan rencana generate plugin dari JSON.
+Jalankan langsung:
 
 ```bash
-gasi plugin plan --target api -f hr-plugin.json
-gasi plugin plan --target web -f hr-plugin.json
+node bin/gasi.js --help
 ```
 
-### `gasi plugin sync`
-
-Generate skeleton plugin dari JSON. Kalau folder plugin sudah ada, command akan skip sebagai `UNCHANGED`.
+Atau daftarkan command `gasi` secara lokal:
 
 ```bash
-gasi plugin sync --target api -f hr-plugin.json
-gasi plugin sync --target web -f hr-plugin.json
+npm link
+gasi --help
 ```
 
-**Opsi:**
+Jika tidak ingin memakai `npm link`, semua contoh command bisa diganti menjadi:
 
-| Flag | Keterangan |
-|---|---|
-| `--target <target>` | Wajib. Target: `api` atau `web` |
-| `-f, --file <file>` | Wajib. File definisi plugin JSON |
-| `--cwd <path>` | Root project directory (default: cwd) |
+```bash
+node /path/to/gasi-cli/bin/gasi.js <command>
+```
 
-Contoh `hr-plugin.json`:
+## Konsep Utama
+
+### Target
+
+Banyak command menerima `--target`:
+
+| Target | Fungsi |
+| --- | --- |
+| `api` | Generate, build, deploy, clean, atau delete bagian backend Spring Boot + PF4J. |
+| `web` | Generate, build, deploy, clean, atau delete bagian frontend React + Vite. |
+| `all` | Menjalankan operasi API dan web sekaligus. Hanya tersedia pada command lifecycle seperti build, deploy, clean, dan delete. |
+
+### Plugin
+
+Plugin adalah modul fitur yang bisa memiliki bagian API dan/atau web. Plugin dibuat dari file definisi JSON menggunakan command `plugin sync`.
+
+Contoh module hasil generate:
+
+```text
+plugins/hr-plugin/
+├── pom.xml                         # API plugin
+├── src/main/java/...               # API source
+├── src/main/resources/...          # plugin.properties, migration, i18n
+├── package.json                    # web plugin
+├── vite.config.ts
+└── src/features/hr/routes.tsx
+```
+
+Isi folder tergantung target yang digenerate.
+
+### Resource
+
+Resource adalah entity atau layar data di dalam plugin. Dari satu resource definition, CLI dapat membuat:
+
+- API: entity, DTO, mapper, repository, service, controller, migration, dan hook;
+- Web: route, page, form, columns, service, hooks, schemas, lookup, types, dan i18n.
+
+Resource bisa dibuat sebagai:
+
+- `crud`: memiliki create, read, update, delete;
+- `read`: hanya untuk data yang dibaca atau dikelola dari tempat lain.
+
+### Manifest Generated
+
+Command resource menyimpan catatan file generated agar operasi berikutnya dapat mengenali file yang sudah pernah dibuat. Ini membantu command `plan`, `sync`, dan `delete` bekerja lebih aman.
+
+## Alur Kerja Cepat
+
+Contoh membuat plugin `hr` dengan API dan web.
+
+### 1. Buat file plugin definition
+
+Simpan sebagai `hr-plugin.json` di root project target:
 
 ```json
 {
@@ -80,601 +173,44 @@ Contoh `hr-plugin.json`:
 }
 ```
 
-**Output web plugin** (`plugins/hr-plugin/`):
-```
-plugins/hr-plugin/
-├── src/
-│   ├── features/hr/routes.tsx   ← entry point routes
-│   └── index.ts                 ← register ke pluginRegistry
-├── package.json
-├── vite.config.ts               ← build UMD untuk runtime plugin host
-└── tsconfig.json
-```
-
----
-
-### `gasi plugin build <name>`
-
-Build plugin.
+### 2. Validasi plugin definition
 
 ```bash
-# Build web saja
-gasi plugin build hr --target web
-
-# Build API saja
-gasi plugin build hr --target api
-
-# Build keduanya
-gasi plugin build hr --target all
-
-# Dry run
-gasi plugin build hr --target all --dry-run
+gasi plugin validate --target api -f hr-plugin.json
+gasi plugin validate --target web -f hr-plugin.json
 ```
 
-**Opsi:**
-
-| Flag | Keterangan |
-|---|---|
-| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
-| `--skip-tests` | Skip tests saat Maven build (API only) |
-| `--profile <name>` | Maven profile yang diaktifkan (API only) |
-| `--verbose` | Tampilkan full Maven output (API only) |
-| `--dry-run` | Print command tanpa menjalankan |
-| `--cwd <path>` | Root project directory (default: cwd) |
-
-Web build output ke `plugins/hr-plugin/dist/plugin-hr.umd.cjs`.
-
----
-
-### `gasi plugin deploy <name>`
-
-Deploy plugin ke platform.
+### 3. Lihat rencana generate
 
 ```bash
-# Deploy API (copy JAR → platform-app/plugins/)
-gasi plugin deploy hr --target api
-
-# Deploy Web (copy bundle dan update manifest)
-gasi plugin deploy hr --target web
-
-# Keduanya
-gasi plugin deploy hr --target all
-
-# Dry run
-gasi plugin deploy hr --target all --dry-run
+gasi plugin plan --target api -f hr-plugin.json
+gasi plugin plan --target web -f hr-plugin.json
 ```
 
-**Opsi:**
-
-| Flag | Keterangan |
-|---|---|
-| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
-| `--plugins-dir <path>` | Override direktori deployment plugin |
-| `--keep-old` | Simpan JAR lama yang sudah dideploy (API only) |
-| `--keep-deployed` | Skip hapus file deployed saat delete |
-| `--dry-run` | Print aksi deploy tanpa mengubah file |
-| `--cwd <path>` | Root project directory (default: cwd) |
-
-> Web deploy copy file dari `plugins/hr-plugin/dist/` ke `platform-app/public/plugins/`
-> dan menambahkan URL bundle ke `platform-app/public/plugins/manifest.json`.
-
-
----
-
-### `gasi plugin clean <name>`
-
-Hapus deployed files dari platform.
+### 4. Generate plugin
 
 ```bash
-# Hapus JAR dari platform-app/plugins/
-gasi plugin clean hr --target api
-
-# Hapus UMD dari platform-app/public/plugins/ dan manifest
-gasi plugin clean hr --target web
-
-# Keduanya
-gasi plugin clean hr --target all
-
-# Dry run
-gasi plugin clean hr --target all --dry-run
+gasi plugin sync --target api -f hr-plugin.json
+gasi plugin sync --target web -f hr-plugin.json
 ```
 
-**Opsi:**
+### 5. Buat resource definition
 
-| Flag | Keterangan |
-|---|---|
-| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
-| `--plugins-dir <path>` | Override direktori deployment plugin |
-| `--dry-run` | Print aksi clean tanpa mengubah file |
-| `--cwd <path>` | Root project directory (default: cwd) |
-
----
-
-### `gasi plugin delete <name>`
-
-Hapus folder plugin dan semua deployed files.
-
-```bash
-# Hapus API plugin
-gasi plugin delete hr --target api
-
-# Hapus web plugin
-gasi plugin delete hr --target web
-
-# Hapus keduanya
-gasi plugin delete hr --target all
-
-# Skip konfirmasi
-gasi plugin delete hr --target all -y
-
-# Dry run
-gasi plugin delete hr --target all --dry-run
-```
-
-**Opsi:**
-
-| Flag | Keterangan |
-|---|---|
-| `-t, --target <target>` | Target: `api`, `web`, atau `all` (default: `api`) |
-| `--plugins-dir <path>` | Override direktori deployment plugin |
-| `--keep-deployed` | Simpan file deployed saat hapus folder plugin |
-| `--dry-run` | Print rencana hapus tanpa mengeksekusi |
-| `-y, --yes` | Skip konfirmasi |
-| `--cwd <path>` | Root project directory (default: cwd) |
-
-Delete plan yang ditampilkan sebelum eksekusi:
-```
-Delete plan:
-
-  API:
-    Unregister from : pom.xml
-    Remove dir      : plugins/hr-plugin
-    Remove JAR      : platform-app/plugins/hr-plugin-1.0.0.jar
-
-  Web:
-    Remove dir      : plugins/hr-plugin
-    Remove bundle   : platform-app/public/plugins/plugin-hr.umd.cjs
-    Remove manifest : /plugins/plugin-hr.umd.cjs
-```
-
----
-
-### `gasi plugin list`
-
-List plugin yang terdaftar di parent `pom.xml`.
-
-```bash
-gasi plugin list
-```
-
-**Opsi:**
-
-| Flag | Keterangan |
-|---|---|
-| `--cwd <path>` | Root project directory (default: cwd) |
-
----
-
-### `gasi resource validate`
-
-Validasi file definisi resource tanpa generate file.
-
-```bash
-gasi resource validate -f employee.json
-gasi resource validate -f employee.json -f department.json
-```
-
-### `gasi resource plan`
-
-Bandingkan file JSON dengan manifest generated resource.
-
-```bash
-gasi resource plan --target api --plugin plugins/hr-plugin -f employee.json
-gasi resource plan --target web --plugin plugins/hr-plugin -f employee.json
-```
-
-Status yang ditampilkan:
-
-| Status | Keterangan |
-|---|---|
-| `CREATE` | Resource belum pernah tercatat di manifest |
-| `UPDATE` | Resource sudah ada, tapi hash JSON berubah |
-| `UNCHANGED` | Resource sama dengan manifest, aman dilewati saat sync |
-
-### `gasi resource sync`
-
-Generate resource dari JSON sebagai source of truth. Resource yang tidak berubah akan dilewati berdasarkan manifest.
-
-```bash
-gasi resource sync --target api --plugin plugins/hr-plugin -f employee.json
-gasi resource sync --target api --plugin plugins/hr-plugin -f employee.json -f department.json
-gasi resource sync --target web --plugin plugins/hr-plugin -f employee.json
-```
-
-Manifest dibuat per plugin dan per target:
-
-| Target | Manifest |
-|---|---|
-| `api` | `<plugin-api>/.gasi/generated-api-resources.json` |
-| `web` | `<plugin-web>/.gasi/generated-web-resources.json` |
-
-Manifest ini dipakai untuk idempotency: rerun `sync` dengan JSON yang sama tidak akan membuat migration baru atau menulis ulang file resource yang sama.
-
-> Untuk perubahan schema, update JSON terlebih dulu lalu jalankan `gasi resource plan`. Kalau status `UPDATE`, review dampak migration dan generated file sebelum sync.
-
-**Opsi resource:**
-
-| Flag | Keterangan |
-|---|---|
-| `--target <target>` | Wajib untuk `plan` dan `sync`. Target: `api` atau `web` |
-| `--plugin <module>` | Wajib untuk `plan` dan `sync`. Untuk API: plugin module. Untuk web: folder plugin web. |
-| `-f, --file <file>` | File definisi resource (JSON). Bisa diulang untuk multi-file. |
-| `--cwd <path>` | Root project directory (default: cwd) |
-
-### Generated vs Custom
-
-File API yang dibuat generator diberi header:
-
-```java
-// Generated by gasi CLI from resource JSON. Do not edit directly.
-```
-
-Aturannya:
-
-| Area | Tempat perubahan |
-|---|---|
-| Field, DTO, validasi, table, relasi | Update file JSON lalu generate/sync ulang |
-| Service lifecycle tambahan | Tambah class hook custom dengan `@ResourceHook(value = "...", layer = HookLayer.SERVICE)` |
-| Controller lifecycle tambahan | Tambah class hook custom dengan `@ResourceHook(value = "...", layer = HookLayer.CONTROLLER)` |
-| Endpoint baru dengan prefix URL sama | Tambah controller custom dengan `@RequestMapping` prefix yang sama dan method path berbeda |
-| Repository/mapper custom behavior | Tambah hook layer `REPOSITORY` atau `MAPPER` |
-
-Jangan edit file generated untuk custom behavior. File custom dibuat terpisah supaya generator bisa dijalankan ulang tanpa menimpa logic developer.
-
-**Output web resource** mengikuti naming convention `gasi.poc.web`:
-
-```
-src/features/employees/
-├── components/
-│   ├── EmployeeColumns.tsx
-│   └── EmployeeForm.tsx
-├── hooks/
-│   └── useEmployee.ts
-├── i18n/
-│   ├── index.ts
-│   └── locales/
-│       ├── en.ts
-│       └── id.ts
-├── lookups/
-│   ├── employeeLookup.ts
-│   └── index.ts
-├── pages/
-│   ├── EmployeeCreatePage.tsx
-│   ├── EmployeeDetailPage.tsx
-│   ├── EmployeeEditPage.tsx
-│   └── EmployeeListPage.tsx
-├── schemas/
-│   ├── employeeCreateSchema.ts
-│   └── employeeUpdateSchema.ts
-├── services/
-│   └── employeeService.ts
-├── types/
-│   └── employee.types.ts
-└── routes.tsx
-```
-
----
-
-### `gasi resource delete <entityName>`
-
-Hapus file generated resource yang tercatat di manifest target, lalu hapus entry manifest-nya. Folder kosong akan dibersihkan sampai batas plugin/root target.
-
-```bash
-gasi resource delete Employee --target api --plugin plugins/hr-plugin
-
-gasi resource delete Employee --target web --plugin plugins/hr-plugin
-
-# Skip konfirmasi
-gasi resource delete Employee --target api --plugin plugins/hr-plugin -y
-```
-
-**Opsi:**
-
-| Flag | Keterangan |
-|---|---|
-| `--target <target>` | Wajib. Target: `api` atau `web` |
-| `--plugin <module>` | Wajib. Untuk API: plugin module. Untuk web: folder plugin web. |
-| `-y, --yes` | Skip konfirmasi |
-| `--cwd <path>` | Root project directory (default: cwd) |
-
-Delete tidak menebak file berdasarkan nama entity. File yang dihapus hanya yang ada di `.gasi/generated-api-resources.json` atau `.gasi/generated-web-resources.json`.
-
----
-
-### `gasi uploader create <name>`
-
-Generate `DataUplProcessor` untuk upload data.
-
-```bash
-# Interactive (pilih plugin dari daftar)
-gasi uploader create Employee
-
-# Tentukan plugin dan resource name secara eksplisit
-gasi uploader create Employee --plugin hr --resource employees
-```
-
-**Opsi:**
-
-| Flag | Keterangan |
-|---|---|
-| `--plugin <name>` | Nama plugin target (contoh: `hr` atau `plugins/hr-plugin`) |
-| `--resource <name>` | Nama resource upload API (contoh: `employees`) |
-| `-y, --yes` | Skip konfirmasi |
-| `--cwd <path>` | Root project directory (default: cwd) |
-
----
-
-## Resource Definition File
-
-```json
-{
-  "entityName": "Employee",
-  "mode": "crud",
-  "identifier": ["employeeNo", "fullName"],
-  "basePath": "/hr/employees",
-  "fields": [
-    { "name": "employeeNo", "type": "String",  "required": true,  "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } },
-    { "name": "fullName",   "type": "String",  "required": true,  "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } },
-    { "name": "email",      "type": "String",  "required": false, "dto": { "summary": false, "detail": true, "create": true, "update": true }, "validation": { "email": true } },
-    { "name": "joinDate",   "type": "Date",    "required": false, "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } },
-    { "name": "isActive",   "type": "Boolean", "required": true,  "filterable": true, "dto": { "summary": true, "detail": true, "create": true, "update": true } }
-  ]
-}
-```
-
-### Multi-resource file
-
-File definisi bisa berisi lebih dari satu resource. Format yang didukung:
-
-**Array langsung:**
-```json
-[
-  { "entityName": "Employee", "fields": [...] },
-  { "entityName": "Department", "fields": [...] }
-]
-```
-
-**Object dengan key `resources`:**
-```json
-{
-  "resources": [
-    { "entityName": "Employee", "fields": [...] },
-    { "entityName": "Department", "fields": [...] }
-  ]
-}
-```
-
-Semua `entityName` di dalam satu file (atau lintas beberapa `-f`) harus unik.
-
----
-
-### Tipe Field
-
-| Tipe | Java | Keterangan |
-|---|---|---|
-| `String` | `String` | Teks pendek, default length 255 |
-| `Text` | `String` | Teks panjang (`@Lob`) |
-| `MediumText` | `String` | Teks sedang (`@Column(columnDefinition = "MEDIUMTEXT")`) |
-| `Integer` | `Integer` | Bilangan bulat 32-bit |
-| `Long` | `Long` | Bilangan bulat 64-bit |
-| `BigDecimal` | `BigDecimal` | Desimal presisi tinggi |
-| `Double` | `Double` | Desimal double |
-| `Boolean` | `Boolean` | True/false |
-| `Date` | `LocalDate` | Tanggal |
-| `DateTime` | `LocalDateTime` | Tanggal dan waktu |
-| `Instant` | `Instant` | Timestamp UTC |
-| `Enum` | `<EnumName>` | Enum Java, butuh `enumName` |
-| `ManyToOne` | `<Entity>` | Relasi FK, butuh `refEntity` |
-
----
-
-### Field Properties
-
-| Property | Tipe | Default | Keterangan |
-|---|---|---|---|
-| `name` | string | — | Nama field, camelCase |
-| `type` | string | — | Tipe field (lihat tabel di atas) |
-| `required` | boolean | `true` | Field wajib diisi |
-| `unique` | boolean | `false` | Field harus unik. Hanya untuk `String`, `Integer`, `Long`. |
-| `filterable` | boolean | `false` | Field bisa dipakai sebagai filter di API backend |
-| `length` | number | `255` | Panjang maksimum kolom. Hanya untuk `String`. |
-| `enumName` | string | — | Nama class Enum Java. Wajib untuk `Enum`. |
-| `enumValues` | string[] | — | Nilai-nilai enum (UPPER_SNAKE_CASE). Bisa juga pakai `values`. |
-| `refEntity` | string | — | Nama entity referensi, PascalCase. Wajib untuk `ManyToOne`. |
-| `dto` | object | semua `true` | Kontrol inklusi field di masing-masing DTO (`create`, `update`, `summary`, `detail`). |
-| `defaultColumn` | boolean | `true` | Apakah kolom tampil secara default di datatable. |
-| `description` | string | — | Teks deskripsi field yang ditampilkan di form. |
-| `tooltip` | string | — | Teks tooltip yang muncul saat hover di form. |
-| `filterable` | boolean | `false` | Kapabilitas filter API/backend. |
-| `validation` | object | `{}` | Validasi field (lihat tabel validasi). |
-
----
-
-### Field Validation
-
-Blok `validation` mendukung constraint per tipe field.
-
-**String, Text, MediumText:**
-
-| Key | Tipe | Keterangan |
-|---|---|---|
-| `email` | boolean | Validasi format email |
-| `minLength` | number | Panjang minimum string |
-| `maxLength` | number | Panjang maksimum string (tidak boleh melebihi `length`) |
-| `pattern` | string | Regex Java yang harus cocok |
-| `patternMessage` | string | Pesan error custom untuk `pattern` |
-
-**Integer, Long:**
-
-| Key | Tipe | Keterangan |
-|---|---|---|
-| `min` | number | Nilai minimum |
-| `max` | number | Nilai maksimum |
-| `positive` | boolean | Harus > 0 |
-| `positiveOrZero` | boolean | Harus >= 0 |
-| `negative` | boolean | Harus < 0 |
-| `negativeOrZero` | boolean | Harus <= 0 |
-
-**BigDecimal, Double:**
-
-| Key | Tipe | Keterangan |
-|---|---|---|
-| `decimalMin` | string | Nilai minimum (string desimal, misal `"0.01"`) |
-| `decimalMax` | string | Nilai maksimum |
-| `digits` | object | `{ "integer": N, "fraction": N }` — batas digit integer dan pecahan |
-| `positive` | boolean | Harus > 0 |
-| `positiveOrZero` | boolean | Harus >= 0 |
-| `negative` | boolean | Harus < 0 |
-| `negativeOrZero` | boolean | Harus <= 0 |
-
-**Date, DateTime, Instant:**
-
-| Key | Tipe | Keterangan |
-|---|---|---|
-| `past` | boolean | Harus di masa lalu |
-| `pastOrPresent` | boolean | Harus di masa lalu atau sekarang |
-| `future` | boolean | Harus di masa depan |
-| `futureOrPresent` | boolean | Harus di masa depan atau sekarang |
-
-> Hanya satu dari empat di atas yang boleh aktif sekaligus.
-
-**Boolean:**
-
-| Key | Tipe | Keterangan |
-|---|---|---|
-| `assertTrue` | boolean | Harus bernilai `true` |
-| `assertFalse` | boolean | Harus bernilai `false` |
-
-Contoh validasi:
-
-```json
-{ "name": "email", "type": "String", "validation": { "email": true, "maxLength": 100 } }
-{ "name": "salary", "type": "BigDecimal", "validation": { "decimalMin": "0.00", "digits": { "integer": 10, "fraction": 2 } } }
-{ "name": "age", "type": "Integer", "validation": { "min": 18, "max": 65 } }
-{ "name": "birthDate", "type": "Date", "validation": { "past": true } }
-```
-
----
-
-`mode` bersifat opsional dan default-nya `crud`.
-
-- `mode: "crud"`: generator API memakai base write+read (`BaseService`/`BaseServiceImpl`/`BaseController`). Generator web membuat list, detail, create, edit, form, schema, tombol add/edit/delete, dan bulk action sesuai permission.
-- `mode: "read"`: generator API memakai read-only base (`BaseReadService`/`BaseReadServiceImpl`/`BaseReadController`). Generator web hanya membuat list dan detail. List tetap punya search/filter/sort/pagination/export dan row action view/detail, tetapi tidak membuat tombol add, edit, delete, bulk delete, upload, create page, edit page, form, atau schema create/update.
-
-Contoh read-only resource:
-
-```json
-{
-  "entityName": "AuditLog",
-  "mode": "read",
-  "identifier": ["eventType", "actor"],
-  "fields": [
-    { "name": "eventType", "type": "String", "required": true, "filterable": true },
-    { "name": "actor", "type": "String", "required": false, "filterable": true },
-    { "name": "resourceName", "type": "String", "required": true, "filterable": true },
-    { "name": "createdAt", "type": "Instant", "required": true, "filterable": true }
-  ]
-}
-```
-
-`identifier` bersifat opsional dan dipakai web generator untuk mengganti segment ID di breadcrumb detail/edit. Bisa string tunggal atau array field, misalnya `"identifier": "code"` atau `"identifier": ["code", "name"]`. Field yang dipakai harus ikut di DTO detail.
-
-### Field metadata
-
-`filterable` adalah capability API/backend. Field dengan `filterable: true` akan disiapkan agar boleh dipakai dalam request filter backend. Jangan pakai `filterable` sebagai satu-satunya instruksi tampilan datatable.
-
-Contoh konfigurasi `ui` di level resource:
-
-```json
-{
-  "entityName": "Employee",
-  "ui": {
-    "table": {
-      "searchFields": ["employeeNo", "fullName"],
-      "filters": [
-        { "field": "joinDate", "type": "date-range", "placement": "inline" },
-        { "field": "isActive", "type": "boolean", "placement": "toolbar" }
-      ]
-    }
-  },
-  "fields": [
-    { "name": "employeeNo", "type": "String",  "filterable": true },
-    { "name": "joinDate",   "type": "Date",    "filterable": true },
-    { "name": "isActive",   "type": "Boolean", "filterable": true }
-  ]
-}
-```
-
-Untuk target API, setiap `Enum` otomatis dibuatkan class Java di package `domain.model`, misalnya
-`src/main/java/.../domain/model/EmployeeStatus.java`. Nilai enum bisa ditulis lewat
-`enumValues` atau `values`; jika kosong, CLI tetap membuat file enum kosong yang bisa dilengkapi manual.
-
-Supported `ui.table` properties:
-
-| Property | Keterangan |
-|---|---|
-| `searchFields` | Daftar field untuk global search datatable. |
-| `defaultColumns` | Daftar field yang tampil sebagai kolom default di datatable. |
-| `filters` | Daftar filter datatable. Bisa string field atau object `{ "field": "...", "placement": "inline" }`. Placement valid: `"inline"` atau `"toolbar"`, default `"toolbar"`. |
-
-Setiap item di dalam `filters` bisa berupa string field name atau object dengan opsi berikut:
-
-| Key | Keterangan |
-|---|---|
-| `field` | Nama field yang difilter |
-| `placement` | `"inline"` atau `"toolbar"` (default `"toolbar"`) |
-| `type` | `"text"`, `"select"`, `"multi-select"`, `"date"`, `"date-range"`, `"lookup"`, `"boolean"`, atau `"toggle"`. Jika tidak diisi, generator infer dari tipe field (`ManyToOne` → `"lookup"`, `Boolean` → `"boolean"`). |
-| `options` | Optional untuk `select`/`multi-select`. Boolean filter otomatis punya opsi all/yes/no. |
-
-Contoh filter lookup untuk relasi `ManyToOne` (`Employee.department`):
-
-```json
-{
-  "entityName": "Employee",
-  "ui": {
-    "table": {
-      "filters": [
-        { "field": "department", "type": "lookup", "placement": "inline" }
-      ]
-    }
-  },
-  "fields": [...]
-}
-```
-
-Generator membuat filter ke field `departmentId`, tetapi UI-nya memakai `LookupPicker` dengan preset `departmentLookup`.
-
-Contoh filter boolean dan toggle:
-
-```json
-{
-  "ui": {
-    "table": {
-      "filters": [
-        { "field": "active",         "type": "boolean", "placement": "toolbar" },
-        { "field": "primaryAddress", "type": "toggle",  "placement": "inline" }
-      ]
-    }
-  }
-}
-```
-
-Untuk resource yang bisa dipilih lewat lookup picker, gunakan `ui.lookup` di level resource. Ini menjadi default cara entity tersebut tampil di semua picker:
+Simpan sebagai `department-resource.json`:
 
 ```json
 {
   "entityName": "Department",
+  "mode": "crud",
+  "identifier": ["code", "name"],
   "ui": {
+    "table": {
+      "searchFields": ["code", "name"],
+      "filters": [
+        { "field": "code", "type": "text", "placement": "toolbar" },
+        { "field": "name", "type": "text", "placement": "toolbar" }
+      ]
+    },
     "lookup": {
       "labelFields": ["code", "name"],
       "searchFields": ["code", "name"],
@@ -684,96 +220,623 @@ Untuk resource yang bisa dipilih lewat lookup picker, gunakan `ui.lookup` di lev
       ]
     }
   },
-  "fields": []
+  "fields": [
+    {
+      "name": "code",
+      "type": "String",
+      "length": 50,
+      "required": true,
+      "unique": true,
+      "filterable": true,
+      "validation": {
+        "minLength": 2,
+        "maxLength": 50,
+        "pattern": "^[A-Z0-9-]+$",
+        "patternMessage": "Code must contain uppercase letters, numbers, or dash only"
+      },
+      "defaultColumn": true
+    },
+    {
+      "name": "name",
+      "type": "String",
+      "length": 150,
+      "required": true,
+      "filterable": true,
+      "validation": {
+        "minLength": 3,
+        "maxLength": 150
+      },
+      "defaultColumn": true
+    },
+    {
+      "name": "description",
+      "type": "Text",
+      "required": false,
+      "dto": {
+        "create": true,
+        "update": true,
+        "summary": false,
+        "detail": true
+      },
+      "validation": {
+        "maxLength": 1000
+      }
+    }
+  ]
 }
 ```
 
-Supported `ui.lookup` properties:
+### 6. Generate resource ke plugin
 
-| Property | Keterangan |
-|---|---|
-| `labelFields` | Field referensi yang digabung sebagai label di trigger form setelah dipilih. |
-| `searchFields` | Field referensi yang dikirim ke lookup search. |
-| `descriptionFields` | Optional, field referensi yang tampil sebagai deskripsi pada mode lookup satu kolom. |
-| `columns` | Kolom yang tampil di modal lookup. Bisa array string atau object `{ "field": "...", "label": "..." }`. |
+```bash
+gasi resource validate -f department-resource.json
 
-Field relasi `ManyToOne` cukup mengarah ke resource target:
+gasi resource plan \
+  --target api \
+  --plugin plugins/hr-plugin \
+  -f department-resource.json
+
+gasi resource sync \
+  --target api \
+  --plugin plugins/hr-plugin \
+  -f department-resource.json
+
+gasi resource sync \
+  --target web \
+  --plugin plugins/hr-plugin \
+  -f department-resource.json
+```
+
+### 7. Build dan deploy plugin
+
+```bash
+gasi plugin build hr --target all --skip-tests
+gasi plugin deploy hr --target all
+```
+
+Setelah deploy web, cek `platform-app/public/plugins/manifest.json`. Bundle plugin harus terdaftar di sana.
+
+## Plugin Definition
+
+Minimal:
+
+```json
+{
+  "name": "hr",
+  "version": "1.0.0",
+  "description": "Human resource plugin"
+}
+```
+
+Dengan konfigurasi lengkap:
+
+```json
+{
+  "name": "hr",
+  "version": "1.0.0",
+  "description": "Human resource plugin",
+  "api": {
+    "domain": "hr",
+    "package": "gasi.gps",
+    "pluginPrefix": "hr",
+    "dependsOn": ["master-data-plugin"],
+    "flyway": true,
+    "register": true
+  },
+  "web": {
+    "displayName": "HR"
+  }
+}
+```
+
+Field penting:
+
+| Field | Keterangan |
+| --- | --- |
+| `name` | Nama plugin. Dipakai untuk folder, artifact, dan identifier. |
+| `version` | Versi plugin. Default `1.0.0` jika kosong. |
+| `description` | Deskripsi plugin. |
+| `api.domain` | Nama domain Java. Default dari `name` tanpa dash. |
+| `api.package` | Base package Java. Default `gasi.gps`. |
+| `api.pluginPrefix` | Prefix plugin untuk naming API. Default sama dengan `name`. |
+| `api.dependsOn` | Daftar dependency plugin PF4J. |
+| `api.flyway` | Generate konfigurasi Flyway. Default `true`. |
+| `api.register` | Register module ke parent `pom.xml`. Default `true`. |
+| `web.displayName` | Nama tampil plugin di UI. |
+
+## Resource Definition
+
+Resource definition bisa berupa satu object, array, atau object dengan property `resources`.
+
+Satu resource:
+
+```json
+{
+  "entityName": "Employee",
+  "mode": "crud",
+  "fields": [
+    { "name": "employeeNo", "type": "String", "length": 50, "required": true, "unique": true },
+    { "name": "fullName", "type": "String", "length": 150, "required": true },
+    { "name": "email", "type": "String", "length": 150, "required": false, "validation": { "email": true } }
+  ]
+}
+```
+
+Banyak resource dalam satu file:
+
+```json
+{
+  "resources": [
+    {
+      "entityName": "Department",
+      "mode": "crud",
+      "fields": [
+        { "name": "code", "type": "String", "length": 50, "required": true, "unique": true },
+        { "name": "name", "type": "String", "length": 150, "required": true }
+      ]
+    },
+    {
+      "entityName": "JobTitle",
+      "mode": "read",
+      "fields": [
+        { "name": "code", "type": "String", "length": 50, "required": true, "unique": true },
+        { "name": "name", "type": "String", "length": 150, "required": true }
+      ]
+    }
+  ]
+}
+```
+
+### Field Resource
+
+| Field | Keterangan |
+| --- | --- |
+| `entityName` | Nama entity dalam PascalCase, contoh `Employee`. |
+| `mode` | `crud` atau `read`. Default `crud`. |
+| `parent` | Parent entity untuk nested resource, contoh `Employee`. |
+| `apiStyle` | `root` atau `nested`. Default `nested` jika ada `parent`, selain itu `root`. |
+| `embedInParentDto` | Menentukan apakah resource ikut ditanam ke DTO parent. Default `false`. |
+| `as` | Nama property saat resource dipakai sebagai child. |
+| `exposeApi` | Menentukan apakah endpoint API dibuat. Default `true`. |
+| `identifier` | Field yang dipakai sebagai label identitas data. Default mencoba `name` dan `code`. |
+| `ui` | Konfigurasi table dan lookup untuk frontend. |
+| `fields` | Daftar field entity. Wajib diisi. |
+
+### Tipe Field
+
+Tipe yang didukung:
+
+| Type | Catatan |
+| --- | --- |
+| `String` | Mendukung `length`; default `255`. |
+| `Text` | Untuk text panjang. |
+| `MediumText` | Untuk text lebih panjang. |
+| `Integer` | Bilangan bulat. |
+| `Long` | Bilangan bulat besar. |
+| `BigDecimal` | Angka decimal presisi. |
+| `Double` | Angka decimal floating-point. |
+| `Boolean` | Nilai true/false. |
+| `Date` | Tanggal. |
+| `DateTime` | Tanggal dan jam. |
+| `Instant` | Timestamp. |
+| `Enum` | Wajib isi `enumName`; bisa isi `enumValues`. |
+| `ManyToOne` | Wajib isi `refEntity`. |
+
+Contoh `Enum`:
+
+```json
+{
+  "name": "status",
+  "type": "Enum",
+  "enumName": "EmployeeStatus",
+  "enumValues": ["ACTIVE", "INACTIVE"],
+  "required": true
+}
+```
+
+Contoh `ManyToOne`:
 
 ```json
 {
   "name": "department",
   "type": "ManyToOne",
   "refEntity": "Department",
+  "required": true
+}
+```
+
+### Konfigurasi Field
+
+| Field | Keterangan |
+| --- | --- |
+| `name` | Nama field dalam camelCase. |
+| `type` | Salah satu tipe field yang didukung. |
+| `required` | Default `true`. |
+| `unique` | Didukung untuk `String`, `Integer`, dan `Long`. Default `false`. |
+| `filterable` | Menandai field dapat difilter. Default `false`. |
+| `defaultColumn` | Menentukan apakah field muncul sebagai default column. Default `true`. |
+| `dto` | Kontrol field masuk DTO `create`, `update`, `summary`, dan `detail`. |
+| `description` | Deskripsi field. |
+| `tooltip` | Bantuan singkat untuk UI. |
+| `validation` | Aturan validasi berdasarkan tipe field. |
+| `ui` | Konfigurasi UI khusus untuk field. |
+
+Contoh `dto`:
+
+```json
+{
+  "name": "internalNote",
+  "type": "Text",
+  "required": false,
+  "dto": {
+    "create": true,
+    "update": true,
+    "summary": false,
+    "detail": true
+  }
+}
+```
+
+### Validasi
+
+Validasi yang didukung mengikuti tipe field.
+
+| Type | Validation |
+| --- | --- |
+| `String`, `Text`, `MediumText` | `email`, `minLength`, `maxLength`, `pattern`, `patternMessage` |
+| `Integer`, `Long` | `min`, `max`, `positive`, `positiveOrZero`, `negative`, `negativeOrZero` |
+| `BigDecimal`, `Double` | `decimalMin`, `decimalMax`, `digits`, `positive`, `positiveOrZero`, `negative`, `negativeOrZero` |
+| `Date`, `DateTime`, `Instant` | `past`, `pastOrPresent`, `future`, `futureOrPresent` |
+| `Boolean` | `assertTrue`, `assertFalse` |
+
+Contoh decimal:
+
+```json
+{
+  "name": "salary",
+  "type": "BigDecimal",
   "required": true,
-  "filterable": true
+  "validation": {
+    "decimalMin": "0",
+    "digits": {
+      "integer": 15,
+      "fraction": 2
+    }
+  }
 }
 ```
 
-Resource child bisa menambahkan `parent` tanpa mendefinisikan field parent secara manual. CLI otomatis menambahkan relasi `ManyToOne` dengan nama field lower-camel dari parent, misalnya `parent: "Employee"` menjadi field domain `employee` dan DTO field `employeeId`.
+### UI Table dan Lookup
+
+Contoh konfigurasi table:
 
 ```json
 {
-  "entityName": "Department",
-  "parent": "Employee",
-  "apiStyle": "root",
-  "embedInParentDto": false,
-  "exposeApi": true,
-  "fields": [
-    { "name": "name", "type": "String" }
-  ]
+  "ui": {
+    "table": {
+      "searchFields": ["employeeNo", "fullName", "email"],
+      "defaultColumns": ["employeeNo", "fullName", "email"],
+      "filters": [
+        { "field": "employeeNo", "type": "text", "placement": "toolbar" },
+        { "field": "active", "type": "toggle", "placement": "toolbar" }
+      ]
+    }
+  }
 }
 ```
 
-Default saat `parent` diisi:
+Tipe filter yang didukung:
 
-- `apiStyle`: `nested`
-- `embedInParentDto`: `false`
-- `exposeApi`: `true`
+- `text`
+- `select`
+- `multi-select`
+- `date`
+- `date-range`
+- `lookup`
+- `boolean`
+- `toggle`
 
-Gunakan `apiStyle: "root"` kalau parent id dikirim dari DTO child, misalnya `employeeId`. Untuk web generator, mode ini membuat input lookup parent di form child dan service FE memakai `/api/v1/departments`.
-
-Gunakan `apiStyle: "nested"` kalau parent id berasal dari URL. Untuk web generator, route dan axios service akan mengikuti parent path, misalnya `/employees/:employeeId/departments` dan `/api/v1/employees/${employeeId}/departments`.
-
-Gunakan `embedInParentDto: true` kalau child kecil perlu ikut masuk ke DTO parent dan disubmit bareng parent. Untuk API generator, mode ini menambahkan field child ke `ParentCreateRequest`, `ParentUpdateRequest`, `ParentDetailResponse`, mapper, dan service parent. Untuk web generator, mode ini menambahkan inline editable table di form parent memakai `FormArrayTable`.
-
-Contoh embedded child:
+Contoh lookup:
 
 ```json
 {
-  "entityName": "EmployeeEmergencyContact",
-  "parent": "Employee",
-  "as": "emergencyContacts",
-  "embedInParentDto": true,
-  "exposeApi": false,
-  "fields": [
-    { "name": "name", "type": "String", "required": true },
-    { "name": "relationship", "type": "Enum", "enumName": "EmergencyContactRelationship", "required": true },
-    { "name": "department", "type": "ManyToOne", "refEntity": "Department", "required": true },
-    { "name": "phone", "type": "String", "required": true }
-  ]
+  "ui": {
+    "lookup": {
+      "labelFields": ["code", "name"],
+      "searchFields": ["code", "name"],
+      "descriptionFields": ["description"],
+      "columns": [
+        { "field": "code", "label": "Code" },
+        { "field": "name", "label": "Name" }
+      ]
+    }
+  }
 }
 ```
 
-Hasil form parent:
+## Command Reference
 
-```tsx
-<FormArrayTable
-  form={form}
-  name="emergencyContacts"
-  title="Employee Emergency Contacts"
-  addLabel="Add Employee Emergency Contact"
-  createRow={() => ({ name: "", relationship: "", departmentId: "", phone: "" })}
-  columns={[
-    { name: "name", header: "Name", type: "text" },
-    { name: "relationship", header: "Relationship", type: "select", options: [] },
-    { name: "departmentId", header: "Department", type: "lookup", options: [] },
-    { name: "phone", header: "Phone", type: "text" }
-  ]}
-/>
+### Global
+
+```bash
+gasi --help
+gasi --version
 ```
 
-Rekomendasi pemakaian:
+Sebagian besar command menerima:
 
-- `apiStyle: "root"`: child bisa dikelola dari menu/list sendiri, parent dipilih lewat lookup.
-- `apiStyle: "nested"`: child punya page sendiri di bawah parent dan tampil sebagai tab table di detail/edit parent.
-- `embedInParentDto: true`: child diedit inline di form parent dan ikut submit di payload parent.
+| Flag | Keterangan |
+| --- | --- |
+| `--cwd <path>` | Root project target. Default adalah current working directory. |
+
+### Plugin Commands
+
+#### `plugin validate`
+
+Validasi file plugin definition tanpa membuat file.
+
+```bash
+gasi plugin validate --target api -f hr-plugin.json
+gasi plugin validate --target web -f hr-plugin.json
+```
+
+| Flag | Keterangan |
+| --- | --- |
+| `--target <target>` | Wajib. `api` atau `web`. |
+| `-f, --file <file>` | Wajib. File plugin definition JSON. |
+| `--cwd <path>` | Root project target. |
+
+#### `plugin plan`
+
+Menampilkan rencana generate plugin.
+
+```bash
+gasi plugin plan --target api -f hr-plugin.json
+gasi plugin plan --target web -f hr-plugin.json
+```
+
+#### `plugin sync`
+
+Generate skeleton plugin dari JSON.
+
+```bash
+gasi plugin sync --target api -f hr-plugin.json
+gasi plugin sync --target web -f hr-plugin.json
+```
+
+Jika folder atau file sudah ada dan tidak perlu diubah, command akan menandainya sebagai unchanged.
+
+#### `plugin list`
+
+Menampilkan plugin module yang terdaftar di parent `pom.xml`.
+
+```bash
+gasi plugin list
+```
+
+#### `plugin build <name>`
+
+Build plugin API, web, atau keduanya.
+
+```bash
+gasi plugin build hr --target api
+gasi plugin build hr --target web
+gasi plugin build hr --target all
+gasi plugin build hr --target all --skip-tests
+gasi plugin build hr --target all --dry-run
+```
+
+| Flag | Keterangan |
+| --- | --- |
+| `-t, --target <target>` | `api`, `web`, atau `all`. Default `api`. |
+| `--skip-tests` | Skip test Maven untuk target API. |
+| `--profile <name>` | Mengaktifkan Maven profile. |
+| `--verbose` | Menampilkan output Maven lengkap. |
+| `--dry-run` | Menampilkan command tanpa menjalankan. |
+| `--cwd <path>` | Root project target. |
+
+#### `plugin deploy <name>`
+
+Deploy plugin hasil build ke platform.
+
+```bash
+gasi plugin deploy hr --target api
+gasi plugin deploy hr --target web
+gasi plugin deploy hr --target all
+gasi plugin deploy hr --target all --dry-run
+```
+
+| Flag | Keterangan |
+| --- | --- |
+| `-t, --target <target>` | `api`, `web`, atau `all`. Default `api`. |
+| `--plugins-dir <path>` | Override folder deployment plugin. |
+| `--keep-old` | Menyimpan JAR lama saat deploy API. |
+| `--dry-run` | Menampilkan aksi deploy tanpa mengubah file. |
+| `--cwd <path>` | Root project target. |
+
+Hasil deploy:
+
+- API: JAR disalin ke `platform-app/plugins/`.
+- Web: bundle disalin ke `platform-app/public/plugins/` dan manifest diperbarui.
+
+#### `plugin clean <name>`
+
+Menghapus file plugin yang sudah dideploy, tanpa menghapus source plugin.
+
+```bash
+gasi plugin clean hr --target api
+gasi plugin clean hr --target web
+gasi plugin clean hr --target all
+gasi plugin clean hr --target all --dry-run
+```
+
+#### `plugin delete <name>`
+
+Menghapus source plugin dan file deployed.
+
+```bash
+gasi plugin delete hr --target api
+gasi plugin delete hr --target web
+gasi plugin delete hr --target all
+gasi plugin delete hr --target all -y
+gasi plugin delete hr --target all --keep-deployed
+gasi plugin delete hr --target all --dry-run
+```
+
+| Flag | Keterangan |
+| --- | --- |
+| `-t, --target <target>` | `api`, `web`, atau `all`. Default `api`. |
+| `--plugins-dir <path>` | Override folder deployment plugin. |
+| `--keep-deployed` | Tidak menghapus file deployed. |
+| `--dry-run` | Menampilkan rencana hapus tanpa menjalankan. |
+| `-y, --yes` | Skip konfirmasi. |
+| `--cwd <path>` | Root project target. |
+
+### Resource Commands
+
+#### `resource validate`
+
+Validasi satu atau banyak file resource definition.
+
+```bash
+gasi resource validate -f department-resource.json
+gasi resource validate -f department-resource.json -f employee-resource.json
+```
+
+#### `resource plan`
+
+Membandingkan resource definition dengan manifest generated di plugin target.
+
+```bash
+gasi resource plan \
+  --target api \
+  --plugin plugins/hr-plugin \
+  -f department-resource.json
+```
+
+| Flag | Keterangan |
+| --- | --- |
+| `--target <target>` | Wajib. `api` atau `web`. |
+| `--plugin <module>` | Wajib. Module plugin target, contoh `plugins/hr-plugin`. |
+| `-f, --file <file>` | File resource definition JSON. Bisa diulang. |
+| `--cwd <path>` | Root project target. |
+
+#### `resource sync`
+
+Generate atau update resource dari definition.
+
+```bash
+gasi resource sync \
+  --target api \
+  --plugin plugins/hr-plugin \
+  -f department-resource.json
+
+gasi resource sync \
+  --target web \
+  --plugin plugins/hr-plugin \
+  -f department-resource.json
+```
+
+#### `resource delete <entityName>`
+
+Menghapus file generated untuk resource tertentu berdasarkan manifest.
+
+```bash
+gasi resource delete Department \
+  --target api \
+  --plugin plugins/hr-plugin
+
+gasi resource delete Department \
+  --target web \
+  --plugin plugins/hr-plugin \
+  -y
+```
+
+## Uploader Generator
+
+Command uploader membuat class `DataUplProcessor` di plugin API yang sudah ada dan menambahkan dependency upload yang diperlukan.
+
+```bash
+gasi uploader create Employee --plugin hr --resource employee -y
+```
+
+Jika command dijalankan dari dalam folder plugin, CLI dapat mencoba mendeteksi plugin target secara otomatis.
+
+| Flag | Keterangan |
+| --- | --- |
+| `--plugin <name>` | Nama plugin target, contoh `hr` atau `plugins/hr-plugin`. |
+| `--resource <name>` | Nama resource upload API, contoh `employee`. |
+| `-y, --yes` | Skip konfirmasi. |
+| `--cwd <path>` | Root project target. |
+
+Setelah generate, review bagian parsing, validasi row, dan commit data pada class processor yang dibuat.
+
+## Tips Aman Saat Generate
+
+- Jalankan `validate` sebelum `sync`.
+- Jalankan `plan` sebelum `sync` saat bekerja di plugin yang sudah berisi banyak file.
+- Gunakan `--dry-run` untuk build, deploy, clean, dan delete saat ingin melihat efek command lebih dulu.
+- Commit perubahan penting sebelum menjalankan operasi delete.
+- Jangan edit manual file dengan header generated kecuali memang siap menjaga perubahan tersebut saat sync berikutnya.
+- Pisahkan file definition plugin dan resource agar perubahan mudah direview.
+
+## Troubleshooting
+
+### `Plugin definition file not found`
+
+Pastikan path pada `-f` benar relatif terhadap `--cwd` atau current working directory.
+
+### `Invalid --target`
+
+Gunakan `api` atau `web` untuk command generate. Gunakan `all` hanya pada command lifecycle seperti `build`, `deploy`, `clean`, dan `delete`.
+
+### `No plugin modules found in the parent pom.xml`
+
+Jalankan command dari root project API yang memiliki parent `pom.xml`, atau isi `--cwd` ke root yang benar.
+
+### Build API gagal
+
+Coba jalankan dengan output lengkap:
+
+```bash
+gasi plugin build hr --target api --verbose
+```
+
+Periksa dependency Maven, Java version, dan apakah module plugin terdaftar di parent `pom.xml`.
+
+### Build web gagal
+
+Pastikan dependency npm sudah terinstall di workspace target, lalu cek apakah plugin web ada di `plugins/<name>-plugin`.
+
+```bash
+npm install
+gasi plugin build hr --target web
+```
+
+### Bundle web tidak muncul di aplikasi
+
+Periksa:
+
+- file bundle ada di `platform-app/public/plugins/`;
+- `platform-app/public/plugins/manifest.json` berisi URL bundle;
+- nama bundle sesuai hasil build;
+- browser tidak memakai cache lama.
+
+### Perlu melihat stack trace
+
+Set environment variable `GASI_DEBUG`:
+
+```bash
+GASI_DEBUG=1 gasi resource sync --target api --plugin plugins/hr-plugin -f department-resource.json
+```
+
+## Script Development
+
+Dari folder `gasi-cli`:
+
+```bash
+npm run start -- --help
+npm run check:resource-idempotency
+```
+
+`check:resource-idempotency` membantu memastikan generator resource tetap stabil saat dijalankan ulang.
